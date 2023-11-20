@@ -4,8 +4,8 @@
         <div class="card-body">
             <form @submit.prevent="submitRegister">
                 <div class="form-group">
-                    <label for="employeeName">First Name</label>
-                    <input type="text" v-model="registerData.employeeName" name="employeeName" id="employeeName" class="form-control">
+                    <label for="firstName">First Name</label>
+                    <input type="text" v-model="registerData.firstName" name="firstName" id="firstName" class="form-control">
                 </div>
                 <div class="form-group">
                     <label for="email">Email</label>
@@ -31,16 +31,18 @@
     export default {
         setup() {
             let registerData = reactive({
-                employeeName: "",
+                firstName: "",
                 email: "",
                 password : "",
             })
-            let errorResponse = reactive({})
+            let errorResponse = reactive({
+                error: ""
+            })
 
             const submitRegister = () => {
-                axios.post("http://localhost:8090/api/v1/employee/save", registerData)
+                axios.post("http://localhost:8090/api/v1/user/save", registerData)
                     .then(() => {
-                        router.push({name: 'login'})                  
+                        router.push({name: 'login'})
                     })
                     .catch(error => {
                         errorResponse.error = error

@@ -1,27 +1,18 @@
 package com.example.SpringVue.Response;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@AllArgsConstructor
 public class LoginResponse {
+
+    @Getter
+    @Setter
     private String message;
+
+    @Getter
+    @Setter
     private Boolean status;
 
-    public LoginResponse(String message, Boolean status) {
-        this.message = message;
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public Boolean getStatus() {
-        return status;
-    }
-
-    public void setStatus(Boolean status) {
-        this.status = status;
-    }
 }

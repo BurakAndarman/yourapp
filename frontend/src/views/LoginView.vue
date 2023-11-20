@@ -33,10 +33,12 @@
                 email: "",
                 password : ""
             })
-            let errorResponse = reactive({})
+            let errorResponse = reactive({
+                error: ""
+            })
 
             const submitLogin = () => {
-                axios.post("http://localhost:8090/api/v1/employee/login", loginData)
+                axios.post("http://localhost:8090/api/v1/user/login", loginData)
                     .then((response) => {
                         if(response.data.status) {
                             router.push({name: 'home', params: { name: loginData.email}})
