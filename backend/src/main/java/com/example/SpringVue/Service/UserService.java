@@ -1,12 +1,9 @@
 package com.example.SpringVue.Service;
 
-import com.example.SpringVue.Dto.UserDto;
-import com.example.SpringVue.Dto.LoginDto;
-import com.example.SpringVue.Response.LoginResponse;
+import com.example.SpringVue.Request.SaveUserRequest;
 
 public interface UserService {
 
-    String addUser(UserDto userDto);
+    String addUser(SaveUserRequest saveUserRequest);
 
-    LoginResponse loginUser(LoginDto userDto);
 }

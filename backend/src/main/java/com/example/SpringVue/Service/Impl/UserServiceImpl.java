@@ -1,68 +1,37 @@
 package com.example.SpringVue.Service.Impl;
 
-import com.example.SpringVue.Dto.LoginDto;
-import com.example.SpringVue.Dto.UserDto;
-import com.example.SpringVue.Entity.User;
-import com.example.SpringVue.Repo.UserRepo;
-import com.example.SpringVue.Response.LoginResponse;
+import com.example.SpringVue.Request.SaveUserRequest;
 import com.example.SpringVue.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    private UserRepo userRepo;
-    private PasswordEncoder passwordEncoder;
+    private UserDetailsManager userDetailsManager;
 
     @Autowired
-    public UserServiceImpl(UserRepo userRepo, PasswordEncoder passwordEncoder){
-        this.userRepo = userRepo;
-        this.passwordEncoder = passwordEncoder;
+    public UserServiceImpl(UserDetailsManager userDetailsManager){
+        this.userDetailsManager = userDetailsManager;
     }
+
 
     @Override
-    public String addUser(UserDto userDto) {
+    public String addUser(SaveUserRequest saveUserRequest) {
 
-        User user = new User(
-          userDto.getId(),
-          userDto.getFirstName(),
-          userDto.getEmail(),
-          this.passwordEncoder.encode(userDto.getPassword())
-        );
+        UserDetails user = User.withDefaultPasswordEncoder()
+                                .username(saveUserRequest.getUserName())
+                                .password(saveUserRequest.getPassword())
+                                .roles("REGULAR") // There is only one user type for now
+                                .build();
 
-        userRepo.save(user);
+        userDetailsManager.createUser(user);
 
-        return user.getFirstName();
+        return user.getUsername();
     }
 
-    @Override
-    public LoginResponse loginUser(LoginDto loginDto) {
-        User user = userRepo.findByEmail(loginDto.getEmail());
 
-        if(user != null) {
-            String password = loginDto.getPassword();
-            String encodedPassword = user.getPassword();
-            Boolean isPwdRight = passwordEncoder.matches(password, encodedPassword);
-
-            if(isPwdRight) {
-                Optional<User> userFromDatabase = userRepo.findOneByEmailAndPassword(loginDto.getEmail(),encodedPassword);
-
-                if(userFromDatabase.isPresent()) {
-                    return new LoginResponse("Login Success",true);
-                } else {
-                    return new LoginResponse("Login Failed", false);
-                }
-            } else {
-
-                return new LoginResponse("Password is not correct",false);
-
-            }
-        } else {
-            return new LoginResponse("Email doesn't exist",false);
-        }
-    }
 }

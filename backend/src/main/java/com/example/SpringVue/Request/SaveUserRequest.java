@@ -1,4 +1,4 @@
-package com.example.SpringVue.Dto;
+package com.example.SpringVue.Request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,19 +7,11 @@ import lombok.ToString;
 
 @AllArgsConstructor
 @ToString
-public class UserDto {
+public class SaveUserRequest {
 
     @Getter
     @Setter
-    private int id;
-
-    @Getter
-    @Setter
-    private String firstName;
-
-    @Getter
-    @Setter
-    private String email;
+    private String userName;
 
     @Getter
     @Setter
