@@ -1,18 +1,39 @@
+<script setup>
+import { reactive, ref } from 'vue';
+import { useAuthStore } from '@/store/auth';
+
+const user = reactive({
+    username: '',
+    password: ''
+})
+const error = ref('');
+
+const onSubmit = async () => {
+    try{
+        await useAuthStore().login(user.username,user.password);
+    } catch (e) {
+        error.value = e;
+    }
+    
+}
+
+</script>
+
 <template>
     <div class="row">
         <div class="col-sm-4">
         <h2 class="align-center">Login</h2>
-            <form @submit.prevent="submitLogin">
+            <form @submit.prevent="onSubmit">
                 <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" v-model="loginData.email" class="form-control" placeholder="email">
+                    <label for="username">Username</label>
+                    <input type="username" v-model="user.username" class="form-control" placeholder="User">
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" v-model="loginData.password" class="form-control" placeholder="Password">
+                    <input type="password" v-model="user.password" class="form-control" placeholder="Password">
                 </div>
                 <br>
-                <div class="alert aler-danger" v-if="errorResponse.error">{{ errorResponse.error }}</div>
+                <div class="alert aler-danger" v-if="error">{{ error }}</div>
                 <button type="submit" class="btn btn-primary">Login</button>
                 <button class="btn btn-info">
                     <RouterLink to="/register">Register</RouterLink>
@@ -21,39 +42,4 @@
         </div>
     </div>
 </template>
-
-<script>
-    import axios from 'axios'
-    import { reactive } from 'vue'
-    import router from '@/router'
-
-    export default {
-        setup() {
-            let loginData = reactive({
-                email: "",
-                password : ""
-            })
-            let errorResponse = reactive({
-                error: ""
-            })
-
-            const submitLogin = () => {
-                axios.post("http://localhost:8090/api/v1/user/login", loginData)
-                    .then((response) => {
-                        if(response.data.status) {
-                            router.push({name: 'home', params: { name: loginData.email}})
-                        }else {
-                            errorResponse.error = response.data.message
-                        }
-                        
-                    })
-                    .catch(error => {
-                        errorResponse.error = error
-                    })
-            }
-
-            return {loginData, submitLogin, errorResponse}
-        }
-    }
-</script>
 

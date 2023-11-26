@@ -22,8 +22,12 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -47,9 +51,10 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain filterChain (HttpSecurity http) throws Exception {
 
-        return http.csrf(csrf -> csrf.disable())
+        return http.cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/v1/user/save")
+                        .requestMatchers("/api/v1/user/save")
                         .permitAll()
                         .anyRequest()
                         .authenticated())
@@ -69,6 +74,20 @@ public class SecurityConfig {
     JwtEncoder jwtEncoder() {
         JWK jwk = new RSAKey.Builder(rsaKeys.publicKey()).privateKey(rsaKeys.privateKey()).build();
         JWKSource<SecurityContext> jwks = new ImmutableJWKSet<>(new JWKSet(jwk));
+
         return new NimbusJwtEncoder(jwks);
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource () {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedMethods(List.of("GET","POST"));
+        configuration.setAllowedHeaders(List.of("Authorization","Content-Type"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
     }
 }
