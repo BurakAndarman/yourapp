@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
         UserDetails user = User.withDefaultPasswordEncoder()
                                 .username(saveUserRequest.getUserName())
                                 .password(saveUserRequest.getPassword())
-                                .roles("REGULAR") // There is only one user type for now
+                                .authorities("REGULAR") // There is only one user type for now
                                 .build();
 
         userDetailsManager.createUser(user);
