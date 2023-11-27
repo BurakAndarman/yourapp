@@ -2,6 +2,7 @@ package com.example.SpringVue.Controller;
 
 import com.example.SpringVue.Request.SaveUserRequest;
 import com.example.SpringVue.Service.UserService;
+import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +21,8 @@ public class UserController {
     }
 
     @GetMapping("/")
-    public String hello(Principal principal) {
-        return "Hello " + principal.getName();
+    public String hello(Authentication authentication) {
+        return "Hello " + authentication.getAuthorities().stream().findFirst().get() + " " + authentication.getName();
     }
 
     @PostMapping("/save")
