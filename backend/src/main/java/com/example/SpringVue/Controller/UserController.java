@@ -1,28 +1,20 @@
 package com.example.SpringVue.Controller;
 
+import com.example.SpringVue.Dto.NewsApi.TopHeadlines.TopHeadlines;
 import com.example.SpringVue.Request.SaveUserRequest;
 import com.example.SpringVue.Service.UserService;
 import org.springframework.security.core.Authentication;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/v1/user")
 public class UserController {
 
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
-
-    }
-
-    @GetMapping("/")
-    public String hello(Authentication authentication) {
-        return "Hello " + authentication.getAuthorities().stream().findFirst().get() + " " + authentication.getName();
     }
 
     @PostMapping("/save")
@@ -31,6 +23,14 @@ public class UserController {
         String userName = userService.addUser(saveUserRequest);
 
         return userName;
+    }
+
+    @GetMapping("/get-news")
+    public TopHeadlines saveUser(Authentication authentication) {
+
+        TopHeadlines userTopHeadlines = userService.getUserNews(authentication.getName());
+
+        return userTopHeadlines;
     }
 
 }
