@@ -1,11 +1,11 @@
 package com.example.SpringVue.Service;
 
-import com.example.SpringVue.Dto.NewsApi.TopHeadlines.TopHeadlines;
-
-import java.util.HashMap;
+import com.example.SpringVue.Dto.NewsApi.Everything.Everything;
 
 public interface NewsService {
 
-    TopHeadlines getTopHeadlines(HashMap<String, String> parameters);
+    Everything getEverything(String q, String language);
+
+    Everything getEverything(String language);
 
 }

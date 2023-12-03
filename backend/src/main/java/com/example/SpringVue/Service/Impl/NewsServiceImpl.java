@@ -1,12 +1,11 @@
 package com.example.SpringVue.Service.Impl;
 
-import com.example.SpringVue.Dto.NewsApi.TopHeadlines.TopHeadlines;
+import com.example.SpringVue.Dto.NewsApi.Everything.Everything;
 import com.example.SpringVue.Service.NewsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
 
 @Service
 public class NewsServiceImpl implements NewsService {
@@ -21,13 +20,23 @@ public class NewsServiceImpl implements NewsService {
         this.restTemplate = restTemplate;
     }
 
-    // TODO: Keep the parameters in a hashmap
-    public TopHeadlines getTopHeadlines(HashMap<String,String> parameters) {
+    public Everything getEverything(String q, String language) {
 
-        String requestUrl = baseUrl + "top-headlines?category=" + parameters.get("category") + "&apiKey=" + key;
-        TopHeadlines topHeadlines = restTemplate.getForObject(requestUrl, TopHeadlines.class);
+        String requestUrl = baseUrl + "top-headlines?q=" + q + "&language=" + language +  "&sortBy=popularity&apiKey=" + key;
 
-        return topHeadlines;
+        Everything everything = restTemplate.getForObject(requestUrl, Everything.class);
+
+        return everything;
+    }
+
+    @Override
+    public Everything getEverything(String language) {
+
+        String requestUrl = baseUrl + "top-headlines?language=" + language +  "&sortBy=popularity&apiKey=" + key;
+
+        Everything everything = restTemplate.getForObject(requestUrl, Everything.class);
+
+        return everything;
     }
 
 }

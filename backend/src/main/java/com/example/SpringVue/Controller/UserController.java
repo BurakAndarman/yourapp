@@ -1,10 +1,16 @@
 package com.example.SpringVue.Controller;
 
-import com.example.SpringVue.Dto.NewsApi.TopHeadlines.TopHeadlines;
+import com.example.SpringVue.Dto.NewsApi.Everything.Article;
+import com.example.SpringVue.Dto.NewsApi.Everything.Everything;
 import com.example.SpringVue.Request.SaveUserRequest;
 import com.example.SpringVue.Service.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -26,11 +32,11 @@ public class UserController {
     }
 
     @GetMapping("/get-news")
-    public TopHeadlines saveUser(Authentication authentication) {
+    public ResponseEntity<List<Article>> getNews(Authentication authentication) {
 
-        TopHeadlines userTopHeadlines = userService.getUserNews(authentication.getName());
+        List<Article> userArticles = userService.getUserNews(authentication.getName());
 
-        return userTopHeadlines;
+        return new ResponseEntity<>(userArticles, HttpStatus.OK);
     }
 
 }
