@@ -13,9 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
-import javax.swing.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,6 +42,8 @@ public class UserServiceImpl implements UserService {
                                 .authorities("REGULAR") // There is only one type of user now
                                 .build();
 
+        newsPreferencesRepository.save(new NewsPreferences(user.getUsername()));
+
         userDetailsManager.createUser(user);
 
         return user.getUsername();
@@ -61,20 +61,25 @@ public class UserServiceImpl implements UserService {
         NewsPreferences validatedNewsPreferences = newsPreferences.get();
 
         String preferredLanguage = validatedNewsPreferences.getLanguage();
-        String[] preferredTopics = validatedNewsPreferences.getInterestedTopics().split(","); // Splitting comma separated topics
+        Boolean topicsEmpty = validatedNewsPreferences.getInterestedTopics().isEmpty();
+
         List<Article> articles = new ArrayList<>();
 
-        if(preferredTopics.length == 0) {
+        if(topicsEmpty) {
             Everything everything = newsService.getEverything(preferredLanguage);
 
             if(everything.getStatus() == "error") {
                 throw new RuntimeException("A provider-related error occurred");
             }
 
-            articles.addAll(everything.getArticles().stream().limit(12).collect(Collectors.toList()));
+            if(!everything.getArticles().isEmpty()) {
+                articles.addAll(everything.getArticles().stream().limit(12).collect(Collectors.toList()));
+            }
 
             return articles;
         }
+
+        String[] preferredTopics = validatedNewsPreferences.getInterestedTopics().split(","); // Splitting comma separated topics
 
         for(String preferredTopic : preferredTopics) {
 
@@ -84,7 +89,10 @@ public class UserServiceImpl implements UserService {
                 throw new RuntimeException("A provider-related error occurred");
             }
 
-            articles.addAll(everything.getArticles().stream().limit(3).collect(Collectors.toList()));
+            if(!everything.getArticles().isEmpty()) {
+                articles.addAll(everything.getArticles().stream().limit(3).collect(Collectors.toList()));
+            }
+
         }
 
         return articles;

@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Entity
-@Table(name = "news_preferences", uniqueConstraints = {@UniqueConstraint(columnNames = {"username"})})
+@Table(name = "news_preferences")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,9 +14,8 @@ import lombok.*;
 public class NewsPreferences {
 
     @Id
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "users.username")
-    private Users user;
+    @Column(name = "username",nullable = false,length = 50)
+    private String userName;
 
     @Column(name="language")
     @Size(max = 2, min = 2)
@@ -25,4 +24,12 @@ public class NewsPreferences {
     @Column(name="interested_topics",length = 80)
     private String interestedTopics = "";
 
+    public NewsPreferences(String userName) {
+        this.userName = userName;
+    }
+
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "username")
+    private User user;
 }

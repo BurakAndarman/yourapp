@@ -22,7 +22,7 @@ public class NewsServiceImpl implements NewsService {
 
     public Everything getEverything(String q, String language) {
 
-        String requestUrl = baseUrl + "top-headlines?q=" + q + "&language=" + language +  "&sortBy=popularity&apiKey=" + key;
+        String requestUrl = baseUrl + "everything?q=" + q + "&language=" + language +  "&sortBy=popularity&apiKey=" + key;
 
         Everything everything = restTemplate.getForObject(requestUrl, Everything.class);
 
@@ -32,7 +32,9 @@ public class NewsServiceImpl implements NewsService {
     @Override
     public Everything getEverything(String language) {
 
-        String requestUrl = baseUrl + "top-headlines?language=" + language +  "&sortBy=popularity&apiKey=" + key;
+        String requestUrl = baseUrl + "everything?language=" + language +  "&sortBy=popularity&apiKey=" + key;
+
+        System.out.println(requestUrl);
 
         Everything everything = restTemplate.getForObject(requestUrl, Everything.class);
 

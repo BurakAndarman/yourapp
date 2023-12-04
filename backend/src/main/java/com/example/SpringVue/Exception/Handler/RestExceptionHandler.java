@@ -13,7 +13,7 @@ public class RestExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleException (NewsPreferenceNotFound newsPreferenceNotFound) {
 
-        // using generic error response
+        // using general error response
 
         ErrorResponse error = new ErrorResponse();
 
