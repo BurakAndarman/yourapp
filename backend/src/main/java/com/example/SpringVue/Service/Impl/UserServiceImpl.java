@@ -1,10 +1,11 @@
 package com.example.SpringVue.Service.Impl;
 
-import com.example.SpringVue.Dto.NewsApi.Everything.Article;
-import com.example.SpringVue.Dto.NewsApi.Everything.Everything;
+import com.example.SpringVue.Dto.NewsApi.TopHeadlines.Article;
+import com.example.SpringVue.Dto.NewsApi.TopHeadlines.TopHeadlines;
 import com.example.SpringVue.Entity.NewsPreferences;
 import com.example.SpringVue.Exception.NewsPreferenceNotFound;
 import com.example.SpringVue.Repo.NewsPreferencesRepository;
+import com.example.SpringVue.Repo.UserRepository;
 import com.example.SpringVue.Request.SaveUserRequest;
 import com.example.SpringVue.Service.NewsService;
 import com.example.SpringVue.Service.UserService;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -27,10 +27,13 @@ public class UserServiceImpl implements UserService {
 
     private final NewsPreferencesRepository newsPreferencesRepository;
 
-    public UserServiceImpl(UserDetailsManager userDetailsManager, NewsService newsService, NewsPreferencesRepository newsPreferencesRepository){
+    private final UserRepository userRepository;
+
+    public UserServiceImpl(UserDetailsManager userDetailsManager, NewsService newsService, NewsPreferencesRepository newsPreferencesRepository, UserRepository userRepository){
         this.userDetailsManager = userDetailsManager;
         this.newsService = newsService;
         this.newsPreferencesRepository = newsPreferencesRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -39,12 +42,16 @@ public class UserServiceImpl implements UserService {
         UserDetails user = User.withDefaultPasswordEncoder()
                                 .username(saveUserRequest.getUserName())
                                 .password(saveUserRequest.getPassword())
-                                .authorities("REGULAR") // There is only one type of user now
+                                .authorities("REGULAR") // There is only one type of user for now
                                 .build();
 
-        newsPreferencesRepository.save(new NewsPreferences(user.getUsername()));
-
         userDetailsManager.createUser(user);
+
+        Optional<com.example.SpringVue.Entity.User> userFromDatabase = userRepository.findById(user.getUsername());
+
+        if(userFromDatabase.isPresent()) {
+            newsPreferencesRepository.save(new NewsPreferences(user.getUsername(),userFromDatabase.get()));
+        }
 
         return user.getUsername();
     }
@@ -66,14 +73,10 @@ public class UserServiceImpl implements UserService {
         List<Article> articles = new ArrayList<>();
 
         if(topicsEmpty) {
-            Everything everything = newsService.getEverything(preferredLanguage);
+            TopHeadlines topHeadlines = newsService.getTopHeadlines(preferredLanguage);
 
-            if(everything.getStatus() == "error") {
-                throw new RuntimeException("A provider-related error occurred");
-            }
-
-            if(!everything.getArticles().isEmpty()) {
-                articles.addAll(everything.getArticles().stream().limit(12).collect(Collectors.toList()));
+            if(!topHeadlines.getArticles().isEmpty()) {
+                articles.addAll(topHeadlines.getArticles());
             }
 
             return articles;
@@ -83,14 +86,10 @@ public class UserServiceImpl implements UserService {
 
         for(String preferredTopic : preferredTopics) {
 
-            Everything everything = newsService.getEverything(preferredTopic,preferredLanguage);
+            TopHeadlines topHeadlines = newsService.getTopHeadlines(preferredTopic,preferredLanguage);
 
-            if(everything.getStatus() == "error") {
-                throw new RuntimeException("A provider-related error occurred");
-            }
-
-            if(!everything.getArticles().isEmpty()) {
-                articles.addAll(everything.getArticles().stream().limit(3).collect(Collectors.toList()));
+            if(!topHeadlines.getArticles().isEmpty()) {
+                articles.addAll(topHeadlines.getArticles());
             }
 
         }

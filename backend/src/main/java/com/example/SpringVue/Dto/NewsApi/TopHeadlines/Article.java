@@ -1,4 +1,4 @@
-package com.example.SpringVue.Dto.NewsApi.Everything;
+package com.example.SpringVue.Dto.NewsApi.TopHeadlines;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;

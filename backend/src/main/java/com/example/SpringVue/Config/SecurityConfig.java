@@ -53,7 +53,7 @@ public class SecurityConfig {
         return http.cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/user/save")
+                        .requestMatchers("/user/save")
                         .permitAll()
                         .anyRequest()
                         .hasAuthority("REGULAR"))

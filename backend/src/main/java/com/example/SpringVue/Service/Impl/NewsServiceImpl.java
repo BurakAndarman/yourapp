@@ -1,6 +1,6 @@
 package com.example.SpringVue.Service.Impl;
 
-import com.example.SpringVue.Dto.NewsApi.Everything.Everything;
+import com.example.SpringVue.Dto.NewsApi.TopHeadlines.TopHeadlines;
 import com.example.SpringVue.Service.NewsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,25 +20,24 @@ public class NewsServiceImpl implements NewsService {
         this.restTemplate = restTemplate;
     }
 
-    public Everything getEverything(String q, String language) {
+    @Override
+    public TopHeadlines getTopHeadlines(String category, String language) {
 
-        String requestUrl = baseUrl + "everything?q=" + q + "&language=" + language +  "&sortBy=popularity&apiKey=" + key;
+        String requestUrl = baseUrl + "top-headlines?category=" + category + "&language=" + language +  "&sortBy=popularity&apiKey=" + key;
 
-        Everything everything = restTemplate.getForObject(requestUrl, Everything.class);
+        TopHeadlines topHeadlines = restTemplate.getForObject(requestUrl, TopHeadlines.class);
 
-        return everything;
+        return topHeadlines;
     }
 
     @Override
-    public Everything getEverything(String language) {
+    public TopHeadlines getTopHeadlines(String language) {
 
-        String requestUrl = baseUrl + "everything?language=" + language +  "&sortBy=popularity&apiKey=" + key;
+        String requestUrl = baseUrl + "top-headlines?language=" + language +  "&sortBy=popularity&apiKey=" + key;
 
-        System.out.println(requestUrl);
+        TopHeadlines topHeadlines = restTemplate.getForObject(requestUrl, TopHeadlines.class);
 
-        Everything everything = restTemplate.getForObject(requestUrl, Everything.class);
-
-        return everything;
+        return topHeadlines;
     }
 
 }

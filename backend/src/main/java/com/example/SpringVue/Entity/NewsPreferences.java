@@ -24,12 +24,13 @@ public class NewsPreferences {
     @Column(name="interested_topics",length = 80)
     private String interestedTopics = "";
 
-    public NewsPreferences(String userName) {
-        this.userName = userName;
-    }
-
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @MapsId
     @JoinColumn(name = "username")
     private User user;
+
+    public NewsPreferences(String userName, User user) {
+        this.userName = userName;
+        this.user = user;
+    }
 }

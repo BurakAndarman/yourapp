@@ -1,12 +1,9 @@
 package com.example.SpringVue.Controller;
 
-import com.example.SpringVue.Dto.NewsApi.Everything.Article;
-import com.example.SpringVue.Dto.NewsApi.Everything.Everything;
+import com.example.SpringVue.Dto.NewsApi.TopHeadlines.Article;
 import com.example.SpringVue.Request.SaveUserRequest;
 import com.example.SpringVue.Service.UserService;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;

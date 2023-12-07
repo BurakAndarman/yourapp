@@ -1,6 +1,6 @@
 package com.example.SpringVue.Service;
 
-import com.example.SpringVue.Dto.NewsApi.Everything.Article;
+import com.example.SpringVue.Dto.NewsApi.TopHeadlines.Article;
 import com.example.SpringVue.Request.SaveUserRequest;
 
 import java.util.List;

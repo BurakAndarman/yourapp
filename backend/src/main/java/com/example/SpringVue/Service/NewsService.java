@@ -1,11 +1,11 @@
 package com.example.SpringVue.Service;
 
-import com.example.SpringVue.Dto.NewsApi.Everything.Everything;
+import com.example.SpringVue.Dto.NewsApi.TopHeadlines.TopHeadlines;
 
 public interface NewsService {
 
-    Everything getEverything(String q, String language);
+    TopHeadlines getTopHeadlines(String category, String language);
 
-    Everything getEverything(String language);
+    TopHeadlines getTopHeadlines(String language);
 
 }
