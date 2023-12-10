@@ -6,15 +6,15 @@ const user = reactive({
     username: '',
     password: ''
 })
+const auth = useAuthStore()
 const error = ref('');
 
 const onSubmit = async () => {
     try{
-        await useAuthStore().login(user.username,user.password);
+        await auth.login(user.username,user.password);
     } catch (e) {
         error.value = e;
     }
-    
 }
 
 </script>

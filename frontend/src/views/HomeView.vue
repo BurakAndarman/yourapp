@@ -1,16 +1,19 @@
 <script setup>
 import { useAuthStore } from '../store/auth';
-import { onMounted, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 
 const auth = useAuthStore()
-const data = ref('')
+const data = reactive({
+    articles: []
+})
+const error = ref('')
 
 const logout = () => {
     auth.logout()
 }
 
 onMounted(async () => {
-    const response = await fetch('http://localhost:8090/api/v1/user/',{
+    const response = await fetch('http://localhost:8090/api/v1/user/get-news',{
         method : "GET",
         headers : {
             "Authorization" : `Bearer ${auth.token}`
@@ -18,18 +21,17 @@ onMounted(async () => {
     })
 
     if(response.status == 200) {
-        data.value = await response.text();
+        data.articles = response.json();
     
     } else {
-        data.value = "An error happened while fetching data"
-    } 
+        error.value = response.json().message;
+    }
 })
 
 </script>
 
 <template>
     <h1>
-        {{ data }}
         <a href="#" @click="logout">Logout</a>
     </h1>
 </template>

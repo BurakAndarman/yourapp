@@ -24,9 +24,9 @@
 </template>
 
 <script>
-    import axios from 'axios'
+    //import axios from 'axios'
     import { reactive } from 'vue'
-    import router from '@/router'
+    //import router from '@/router'
 
     export default {
         setup() {
@@ -40,6 +40,7 @@
             })
 
             const submitRegister = () => {
+                /*
                 axios.post("http://localhost:8090/api/v1/user/save", registerData)
                     .then(() => {
                         router.push({name: 'login'})
@@ -47,6 +48,7 @@
                     .catch(error => {
                         errorResponse.error = error
                     })
+                    */
             }
 
             return {registerData, submitRegister, errorResponse}
