@@ -7,11 +7,13 @@ const user = reactive({
     password: ''
 })
 const auth = useAuthStore()
-const error = ref('');
+const error = ref('')
 
 const onSubmit = async () => {
     try{
-        await auth.login(user.username,user.password);
+        if(user.username !== '' && user.password !== ''){
+            await auth.login(user.username,user.password)
+        }        
     } catch (e) {
         error.value = e;
     }
@@ -20,26 +22,34 @@ const onSubmit = async () => {
 </script>
 
 <template>
-    <div class="row">
-        <div class="col-sm-4">
-        <h2 class="align-center">Login</h2>
-            <form @submit.prevent="onSubmit">
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="username" v-model="user.username" class="form-control" placeholder="User">
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" v-model="user.password" class="form-control" placeholder="Password">
-                </div>
-                <br>
-                <div class="alert aler-danger" v-if="error">{{ error }}</div>
-                <button type="submit" class="btn btn-primary">Login</button>
-                <button class="btn btn-info">
-                    <RouterLink to="/register">Register</RouterLink>
-                </button>                
-            </form>
-        </div>
-    </div>
+    <v-container class="d-flex align-center justify-center" style="height: 100vh;background-color: #006064;" fluid>
+        <v-container class="d-flex justify-center">
+            <v-card class="px-8 pb-8 pt-4" width="400">
+                <v-card-item class="pl-0 pb-8 text-center">
+                    <v-card-title class="text-h4">YourApp</v-card-title>
+                    <v-card-subtitle class="pt-4 text-subtitle-1">Welcome To YourApp</v-card-subtitle>
+                </v-card-item>
+                <v-form @submit.prevent="onSubmit">
+                    <v-text-field
+                        v-model="user.username"
+                        label="Username"
+                    ></v-text-field>
+                    <v-text-field
+                        v-model="user.password"
+                        type="password"
+                        label="Password"
+                    ></v-text-field>
+                    <v-alert
+                        v-if="error"
+                        variant="tonal"
+                        type="error"
+                        class="mb-5 mt-5"
+                    >{{ error }}</v-alert>
+                    <v-btn type="submit" color="success" block class="mt-2">Login</v-btn>
+                    <v-btn to="/register" color="light-blue-darken-3" block class="mt-3">Register</v-btn>
+                </v-form>
+            </v-card>
+        </v-container>
+    </v-container>
 </template>
 

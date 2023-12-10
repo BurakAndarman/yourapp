@@ -12,7 +12,7 @@ const logout = () => {
     auth.logout()
 }
 
-onMounted(async () => {
+onMounted(async () => {/*
     const response = await fetch('http://localhost:8090/api/v1/user/get-news',{
         method : "GET",
         headers : {
@@ -26,12 +26,12 @@ onMounted(async () => {
     } else {
         error.value = response.json().message;
     }
+    */
 })
 
 </script>
 
 <template>
-    <h1>
-        <a href="#" @click="logout">Logout</a>
-    </h1>
+    <div>
+    </div>
 </template>

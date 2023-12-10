@@ -1,24 +1,35 @@
+<script setup>
+  import { useAuthStore } from '@/store/auth';
+
+  const auth = useAuthStore()
+
+  const logout = () => {
+    auth.logout()
+}
+</script>
 <template>
-  <v-card
-    color="grey-lighten-4"
-    flat
-    rounded="0"
-  >
-    <v-toolbar density="compact">
-      <v-app-bar-nav-icon></v-app-bar-nav-icon>
-      <v-toolbar-title>Title</v-toolbar-title>
+    <v-toolbar
+      v-if="auth.user"
+      color="cyan-darken-4">
+      <v-toolbar-title class="pl-5">YourApp</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn icon>
-        <v-icon>mdi-magnify</v-icon>
+        <v-icon>mdi-newspaper-variant-multiple</v-icon>
       </v-btn>
       <v-btn icon>
-        <v-icon>mdi-heart</v-icon>
+        <v-icon>mdi-file-outline</v-icon>
       </v-btn>
       <v-btn icon>
-        <v-icon>mdi-dots-vertical</v-icon>
+        <v-icon>mdi-weather-cloudy</v-icon>
+      </v-btn>
+      <v-btn 
+        class="font-weight-bold ml-8"
+        prepend-icon="mdi-logout" 
+        variant="tonal"
+        @click="logout">
+        Logout
       </v-btn>
     </v-toolbar>
-  </v-card>
-  <RouterView/>
+    <RouterView/>
 </template>
 
