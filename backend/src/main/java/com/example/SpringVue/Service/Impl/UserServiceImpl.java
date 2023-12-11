@@ -4,12 +4,15 @@ import com.example.SpringVue.Dto.NewsApi.TopHeadlines.Article;
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.TopHeadlines;
 import com.example.SpringVue.Entity.NewsPreferences;
 import com.example.SpringVue.Exception.DuplicateUsername;
+import com.example.SpringVue.Exception.Handler.RestExceptionHandler;
 import com.example.SpringVue.Exception.NewsPreferenceNotFound;
 import com.example.SpringVue.Repo.NewsPreferencesRepository;
 import com.example.SpringVue.Repo.UserRepository;
 import com.example.SpringVue.Request.SaveUserRequest;
 import com.example.SpringVue.Service.NewsService;
 import com.example.SpringVue.Service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +25,8 @@ import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    private static Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final UserDetailsManager userDetailsManager;
 
@@ -67,6 +72,8 @@ public class UserServiceImpl implements UserService {
     @Cacheable(value = "userNewsCache", key = "#userName")
     @Override
     public List<Article> getUserNews(String userName) {
+
+        log.info("Trying to fetch data from 3rd party api");
 
         Optional<NewsPreferences> newsPreferences = newsPreferencesRepository.findById(userName);
 

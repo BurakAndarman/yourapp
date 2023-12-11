@@ -6,7 +6,7 @@ const auth = useAuthStore()
 const articles = ref([])
 const error = ref('')
 
-onMounted(async () => {/*
+onMounted(async () => {
     const response = await fetch('http://localhost:8090/api/v1/user/get-news',{
         method : "GET",
         headers : {
@@ -14,13 +14,14 @@ onMounted(async () => {/*
         }
     })
 
+    const parsedResponse = await response.json();
+
     if(response.status == 200) {
-        data.articles = response.json();
+        articles.value = parsedResponse;
     
     } else {
-        error.value = response.json().message;
+        error.value = parsedResponse.message;
     }
-    */
 })
 
 </script>
