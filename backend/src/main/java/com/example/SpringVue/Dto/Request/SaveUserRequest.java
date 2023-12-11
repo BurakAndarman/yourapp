@@ -1,4 +1,4 @@
-package com.example.SpringVue.Request;
+package com.example.SpringVue.Dto.Request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

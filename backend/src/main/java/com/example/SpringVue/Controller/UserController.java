@@ -1,7 +1,7 @@
 package com.example.SpringVue.Controller;
 
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.Article;
-import com.example.SpringVue.Request.SaveUserRequest;
+import com.example.SpringVue.Dto.Request.SaveUserRequest;
 import com.example.SpringVue.Service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
