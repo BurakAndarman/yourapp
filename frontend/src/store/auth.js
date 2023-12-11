@@ -12,9 +12,9 @@ export const useAuthStore = defineStore({
         }
     },
     actions: {
-        async login(username, password){
+        async login(userName, password){
 
-            const base64encodedData = Buffer.from(`${username}:${password}`).toString('base64')
+            const base64encodedData = Buffer.from(`${userName}:${password}`).toString('base64')
 
             const response = await fetch('http://localhost:8090/api/v1/auth/token',{
                 method: 'GET',
@@ -26,10 +26,10 @@ export const useAuthStore = defineStore({
             if(response.status == 200) {
                 const token = await response.text()
 
-                localStorage.setItem('user', JSON.stringify(username))
+                localStorage.setItem('user', JSON.stringify(userName))
                 localStorage.setItem('token', JSON.stringify(token))
 
-                this.user = username
+                this.user = userName
                 this.token = token
 
                 router.push(this.returnUrl || '/')
@@ -45,7 +45,7 @@ export const useAuthStore = defineStore({
             this.user = ''
             this.token = ''
 
-            router.push('/login')
+            router.push('/enter')
         }
     }
 })

@@ -1,16 +1,10 @@
 <script setup>
 import { useAuthStore } from '../store/auth';
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 const auth = useAuthStore()
-const data = reactive({
-    articles: []
-})
+const articles = ref([])
 const error = ref('')
-
-const logout = () => {
-    auth.logout()
-}
 
 onMounted(async () => {/*
     const response = await fetch('http://localhost:8090/api/v1/user/get-news',{

@@ -3,12 +3,14 @@ package com.example.SpringVue.Service.Impl;
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.Article;
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.TopHeadlines;
 import com.example.SpringVue.Entity.NewsPreferences;
+import com.example.SpringVue.Exception.DuplicateUsername;
 import com.example.SpringVue.Exception.NewsPreferenceNotFound;
 import com.example.SpringVue.Repo.NewsPreferencesRepository;
 import com.example.SpringVue.Repo.UserRepository;
 import com.example.SpringVue.Request.SaveUserRequest;
 import com.example.SpringVue.Service.NewsService;
 import com.example.SpringVue.Service.UserService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.UserDetailsManager;
@@ -39,6 +41,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public String addUser(SaveUserRequest saveUserRequest) {
 
+        Optional<com.example.SpringVue.Entity.User> userCheck = userRepository.findById(saveUserRequest.getUserName());
+
+        if(userCheck.isPresent()) {
+            throw new DuplicateUsername("There is already a user with the same username");
+        }
+
         UserDetails user = User.withDefaultPasswordEncoder()
                                 .username(saveUserRequest.getUserName())
                                 .password(saveUserRequest.getPassword())
@@ -56,6 +64,7 @@ public class UserServiceImpl implements UserService {
         return user.getUsername();
     }
 
+    @Cacheable(value = "userNewsCache", key = "#userName")
     @Override
     public List<Article> getUserNews(String userName) {
 
@@ -76,7 +85,7 @@ public class UserServiceImpl implements UserService {
             TopHeadlines topHeadlines = newsService.getTopHeadlines(preferredLanguage);
 
             if(!topHeadlines.getArticles().isEmpty()) {
-                articles.addAll(topHeadlines.getArticles());
+                articles.addAll(topHeadlines.getArticles().stream().limit(12).toList());
             }
 
             return articles;
@@ -89,7 +98,7 @@ public class UserServiceImpl implements UserService {
             TopHeadlines topHeadlines = newsService.getTopHeadlines(preferredTopic,preferredLanguage);
 
             if(!topHeadlines.getArticles().isEmpty()) {
-                articles.addAll(topHeadlines.getArticles());
+                articles.addAll(topHeadlines.getArticles().stream().limit(12).toList());
             }
 
         }

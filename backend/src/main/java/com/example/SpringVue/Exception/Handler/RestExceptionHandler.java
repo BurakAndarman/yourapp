@@ -1,5 +1,6 @@
 package com.example.SpringVue.Exception.Handler;
 
+import com.example.SpringVue.Exception.DuplicateUsername;
 import com.example.SpringVue.Exception.NewsPreferenceNotFound;
 import com.example.SpringVue.Exception.Response.ErrorResponse;
 import com.example.SpringVue.Exception.Response.HttpErrorResponse;
@@ -23,12 +24,22 @@ public class RestExceptionHandler {
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleException (NewsPreferenceNotFound newsPreferenceNotFound) {
 
-        // using general error response
-
         ErrorResponse error = new ErrorResponse();
 
         error.setStatus(HttpStatus.BAD_REQUEST.value());
         error.setMessage(newsPreferenceNotFound.getMessage()+" (Username that caused error: "+newsPreferenceNotFound.getCausedUserName());
+        error.setTimeStamp(System.currentTimeMillis());
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleException (DuplicateUsername duplicateUsername) {
+
+        ErrorResponse error = new ErrorResponse();
+
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        error.setMessage(duplicateUsername.getMessage());
         error.setTimeStamp(System.currentTimeMillis());
 
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
@@ -56,7 +67,7 @@ public class RestExceptionHandler {
         try {
 
             ObjectMapper mapper = new ObjectMapper();
-            Map<String, String> providerResponse = mapper.readValue(exc.getResponseBodyAsString(), Map.class);
+            Map<String, Object> providerResponse = mapper.readValue(exc.getResponseBodyAsString(), Map.class);
 
             HttpErrorResponse error = new HttpErrorResponse(status, message, timeStamp, providerResponse);
 

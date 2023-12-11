@@ -13,9 +13,9 @@ import java.util.Map;
 @AllArgsConstructor
 public class HttpErrorResponse extends ErrorResponse{
 
-    private Map<String,String> providerResponse;
+    private Map<String,Object> providerResponse;
 
-    public HttpErrorResponse(int status, String message, long timeStamp, Map<String,String> providerResponse) {
+    public HttpErrorResponse(int status, String message, long timeStamp, Map<String,Object> providerResponse) {
         super(status, message, timeStamp);
         this.providerResponse = providerResponse;
     }
