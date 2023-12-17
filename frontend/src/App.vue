@@ -13,13 +13,13 @@
       color="cyan-darken-4">
       <v-toolbar-title class="pl-5">YourApp</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn icon>
+      <v-btn to="/" icon>
         <v-icon>mdi-newspaper-variant-multiple</v-icon>
       </v-btn>
-      <v-btn icon>
+      <v-btn to="/plans" icon>
         <v-icon>mdi-file-outline</v-icon>
       </v-btn>
-      <v-btn icon>
+      <v-btn to="/weather" icon>
         <v-icon>mdi-weather-cloudy</v-icon>
       </v-btn>
       <v-btn 
