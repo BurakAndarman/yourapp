@@ -33,4 +33,10 @@ public class NewsPreferences {
         this.userName = userName;
         this.user = user;
     }
+
+    public NewsPreferences(String userName, String language, String interestedTopics) {
+        this.userName = userName;
+        this.language = language;
+        this.interestedTopics = interestedTopics;
+    }
 }

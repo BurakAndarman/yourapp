@@ -5,14 +5,16 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 @AllArgsConstructor
 @ToString
 @Getter
 @Setter
-public class SaveUserRequest {
+public class NewsPreferencesRequest {
 
-    private String userName;
+    private String language;
 
-    private String password;
+    private List<String> interestedTopics;
 
 }

@@ -1,7 +1,9 @@
 package com.example.SpringVue.Controller;
 
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.Article;
+import com.example.SpringVue.Dto.Request.NewsPreferencesRequest;
 import com.example.SpringVue.Dto.Request.SaveUserRequest;
+import com.example.SpringVue.Dto.Response.NewsPreferencesResponse;
 import com.example.SpringVue.Service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +37,24 @@ public class UserController {
         List<Article> userArticles = userService.getUserNews(authentication.getName());
 
         return new ResponseEntity<>(userArticles, HttpStatus.OK);
+    }
+
+    @GetMapping("/news-preferences")
+    public ResponseEntity<NewsPreferencesResponse> getNewsPreferences(Authentication authentication) {
+
+        NewsPreferencesResponse newsPreferencesResponse = userService.getNewsPreferences(authentication.getName());
+
+        return new ResponseEntity<>(newsPreferencesResponse, HttpStatus.OK);
+
+    }
+
+    @PostMapping("/news-preferences")
+    public ResponseEntity<String> saveNewsPreferences (@RequestBody NewsPreferencesRequest newsPreferencesRequest, Authentication authentication) {
+
+        String saveMessage = userService.saveNewsPreferences(newsPreferencesRequest, authentication.getName());
+
+        return new ResponseEntity<>(saveMessage, HttpStatus.OK);
+
     }
 
 }

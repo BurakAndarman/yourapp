@@ -47,7 +47,8 @@
                 <h2 class="text-h4 mt-3">Most Popular News Around the World</h2>
             </div>
             <div>
-                <NewsPreferences></NewsPreferences>
+                <NewsPreferences>
+                </NewsPreferences>
             </div>
         </div>
         <div class="my-10 d-flex flex-wrap justify-space-between ga-8">

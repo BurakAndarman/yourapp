@@ -2,6 +2,8 @@ package com.example.SpringVue.Service.Impl;
 
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.Article;
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.TopHeadlines;
+import com.example.SpringVue.Dto.Request.NewsPreferencesRequest;
+import com.example.SpringVue.Dto.Response.NewsPreferencesResponse;
 import com.example.SpringVue.Entity.NewsPreferences;
 import com.example.SpringVue.Exception.DuplicateUsername;
 import com.example.SpringVue.Exception.NewsPreferenceNotFound;
@@ -19,8 +21,11 @@ import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -67,6 +72,52 @@ public class UserServiceImpl implements UserService {
 
         return user.getUsername();
     }
+
+    @Override
+    public NewsPreferencesResponse getNewsPreferences(String userName) {
+
+        Optional<NewsPreferences> newsPreferences = newsPreferencesRepository.findById(userName);
+
+        if(newsPreferences.isEmpty()) {
+            throw new NewsPreferenceNotFound("Couldn't find any user preference",userName);
+        }
+
+        String language = newsPreferences.get().getLanguage();
+        List<String> interestedTopics = Arrays.stream(newsPreferences.get().getInterestedTopics().split(",")).toList();
+
+        return new NewsPreferencesResponse(language, interestedTopics);
+    }
+
+    @Override
+    public String saveNewsPreferences(NewsPreferencesRequest newsPreferencesRequest, String userName) {
+
+        Optional<com.example.SpringVue.Entity.User> user = userRepository.findById(userName);
+
+        if(user.isEmpty()) {
+            throw new RuntimeException("Couldn't find any user with this username");
+        }
+
+        String language = newsPreferencesRequest.getLanguage();
+        String interestedTopics = "";
+
+        log.info(newsPreferencesRequest.getInterestedTopics().stream().findFirst().get());
+
+        if(!newsPreferencesRequest.getInterestedTopics().isEmpty()) {
+            interestedTopics = String.join(",",newsPreferencesRequest.getInterestedTopics());
+        }
+
+        NewsPreferences newsPreferences = new NewsPreferences(
+                                            userName,
+                                            language,
+                                            interestedTopics
+                                          );
+
+        newsPreferencesRepository.save(newsPreferences);
+
+        return "Changed preferences recorded successfully";
+
+    }
+
 
     @Cacheable(value = "userNewsCache", key = "#userName")
     @Override
