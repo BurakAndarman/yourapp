@@ -2,8 +2,8 @@ package com.example.SpringVue.Service.Impl;
 
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.Article;
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.TopHeadlines;
-import com.example.SpringVue.Dto.Request.NewsPreferencesRequest;
-import com.example.SpringVue.Dto.Response.NewsPreferencesResponse;
+import com.example.SpringVue.Dto.Request.SaveNewsPreferencesRequest;
+import com.example.SpringVue.Dto.Response.GetNewsPreferencesResponse;
 import com.example.SpringVue.Entity.NewsPreferences;
 import com.example.SpringVue.Exception.DuplicateUsername;
 import com.example.SpringVue.Exception.NewsPreferenceNotFound;
@@ -15,6 +15,8 @@ import com.example.SpringVue.Service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
+import javax.cache.CacheManager;
+
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.UserDetailsManager;
@@ -24,8 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -40,11 +40,14 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    public UserServiceImpl(UserDetailsManager userDetailsManager, NewsService newsService, NewsPreferencesRepository newsPreferencesRepository, UserRepository userRepository){
+    private final CacheManager cacheManager;
+
+    public UserServiceImpl(UserDetailsManager userDetailsManager, NewsService newsService, NewsPreferencesRepository newsPreferencesRepository, UserRepository userRepository, CacheManager cacheManager){
         this.userDetailsManager = userDetailsManager;
         this.newsService = newsService;
         this.newsPreferencesRepository = newsPreferencesRepository;
         this.userRepository = userRepository;
+        this.cacheManager = cacheManager;
     }
 
     @Override
@@ -74,7 +77,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public NewsPreferencesResponse getNewsPreferences(String userName) {
+    public GetNewsPreferencesResponse getNewsPreferences(String userName) {
 
         Optional<NewsPreferences> newsPreferences = newsPreferencesRepository.findById(userName);
 
@@ -83,27 +86,23 @@ public class UserServiceImpl implements UserService {
         }
 
         String language = newsPreferences.get().getLanguage();
-        List<String> interestedTopics = Arrays.stream(newsPreferences.get().getInterestedTopics().split(",")).toList();
+        List<String> interestedTopics = new ArrayList<>();
 
-        return new NewsPreferencesResponse(language, interestedTopics);
+        if(!newsPreferences.get().getInterestedTopics().isEmpty()) {
+            interestedTopics.addAll(Arrays.stream(newsPreferences.get().getInterestedTopics().split(",")).toList());
+        }
+
+        return new GetNewsPreferencesResponse(language, interestedTopics);
     }
 
     @Override
-    public String saveNewsPreferences(NewsPreferencesRequest newsPreferencesRequest, String userName) {
+    public String saveNewsPreferences(SaveNewsPreferencesRequest saveNewsPreferencesRequest, String userName) {
 
-        Optional<com.example.SpringVue.Entity.User> user = userRepository.findById(userName);
-
-        if(user.isEmpty()) {
-            throw new RuntimeException("Couldn't find any user with this username");
-        }
-
-        String language = newsPreferencesRequest.getLanguage();
+        String language = saveNewsPreferencesRequest.getLanguage();
         String interestedTopics = "";
 
-        log.info(newsPreferencesRequest.getInterestedTopics().stream().findFirst().get());
-
-        if(!newsPreferencesRequest.getInterestedTopics().isEmpty()) {
-            interestedTopics = String.join(",",newsPreferencesRequest.getInterestedTopics());
+        if(!saveNewsPreferencesRequest.getInterestedTopics().isEmpty()) {
+            interestedTopics = String.join(",", saveNewsPreferencesRequest.getInterestedTopics());
         }
 
         NewsPreferences newsPreferences = new NewsPreferences(
@@ -114,7 +113,9 @@ public class UserServiceImpl implements UserService {
 
         newsPreferencesRepository.save(newsPreferences);
 
-        return "Changed preferences recorded successfully";
+        cacheManager.getCache("userNewsCache").remove(userName);
+
+        return "Changes recorded successfully";
 
     }
 
@@ -142,7 +143,7 @@ public class UserServiceImpl implements UserService {
             TopHeadlines topHeadlines = newsService.getTopHeadlines(preferredLanguage);
 
             if(!topHeadlines.getArticles().isEmpty()) {
-                articles.addAll(topHeadlines.getArticles().stream().limit(12).toList());
+                articles.addAll(topHeadlines.getArticles().stream().filter(article -> article.getDescription() != "[Removed]").limit(12).toList());
             }
 
             return articles;
@@ -155,7 +156,7 @@ public class UserServiceImpl implements UserService {
             TopHeadlines topHeadlines = newsService.getTopHeadlines(preferredTopic,preferredLanguage);
 
             if(!topHeadlines.getArticles().isEmpty()) {
-                articles.addAll(topHeadlines.getArticles().stream().limit(12).toList());
+                articles.addAll(topHeadlines.getArticles().stream().filter(article -> article.getDescription() != "[Removed]").limit(12).toList());
             }
 
         }

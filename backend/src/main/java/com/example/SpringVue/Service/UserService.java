@@ -1,9 +1,9 @@
 package com.example.SpringVue.Service;
 
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.Article;
-import com.example.SpringVue.Dto.Request.NewsPreferencesRequest;
+import com.example.SpringVue.Dto.Request.SaveNewsPreferencesRequest;
 import com.example.SpringVue.Dto.Request.SaveUserRequest;
-import com.example.SpringVue.Dto.Response.NewsPreferencesResponse;
+import com.example.SpringVue.Dto.Response.GetNewsPreferencesResponse;
 
 import java.util.List;
 
@@ -13,8 +13,8 @@ public interface UserService {
 
     List<Article> getUserNews(String userName);
 
-    NewsPreferencesResponse getNewsPreferences(String userName);
+    GetNewsPreferencesResponse getNewsPreferences(String userName);
 
-    String saveNewsPreferences(NewsPreferencesRequest newsPreferencesRequest, String userName);
+    String saveNewsPreferences(SaveNewsPreferencesRequest saveNewsPreferencesRequest, String userName);
 
 }

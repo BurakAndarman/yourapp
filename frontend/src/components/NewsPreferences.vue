@@ -3,15 +3,27 @@
     import { useAuthStore } from '../store/auth';
 
     const auth = useAuthStore()
+
+    const props = defineProps({
+        fetchNewArticles: Function
+    });
+
     const dialog = reactive({
         isVisible: false,
         selectedCategories: [],
         selectedLanguage: '',
-        allCategories: ['business','entertainment','health','science','sports','technology'],
-        allLanguages: ['en','de','fr','it','ru','tr'],
         error: '',
         success : ''
     });
+
+    const statusDialog = reactive({
+        isVisible: false,
+        message: '',
+        status: ''
+    })
+
+    const allCategories = ['business','entertainment','health','science','sports','technology'];
+    const allLanguages = ['en','de','fr','it','ru','tr'];
 
     const openDialog = async () => {
 
@@ -37,11 +49,15 @@
                 dialog.isVisible = true;
 
             } else {
-                dialog.error = parsedResponse.message;
+
+                throw new Error(parsedResponse.message)
+        
             }
 
         } catch(e) {
-            dialog.error = e;
+            statusDialog.status = 'error';
+            statusDialog.message = e;
+            statusDialog.isVisible = true;
         }
 
     }
@@ -66,21 +82,36 @@
 
             if(response.status == 401) {
                 auth.logout();
-            }
+            }           
 
             if(response.status == 200) {
-                const successMessage = await response.text()
-                dialog.success = successMessage
+                const successResponse = await response.text()
+
+                statusDialog.status = 'success';
+                statusDialog.message = successResponse;
+                statusDialog.isVisible = true;
+
+                props.fetchNewArticles();
             
             } else {
                 const errorResponse = await response.json()
+
                 throw new Error(errorResponse.message)
             }
 
         } catch(e) {
-            dialog.error = e;
+            statusDialog.status = 'error';
+            statusDialog.message = e;
+            statusDialog.isVisible = true;
+
         }
 
+    }
+
+    const closeStatusDialog = () => {
+        statusDialog.isVisible = false;
+        statusDialog.message = '';
+        statusDialog.status = '';
     }
 </script>
 <template>
@@ -103,7 +134,7 @@
                 title="Choose Categories"
             ></v-toolbar>
             <div class="ma-4">
-                <v-checkbox v-for="(category,index) in dialog.allCategories"
+                <v-checkbox v-for="(category,index) in allCategories"
                     v-model="dialog.selectedCategories"
                     :label="category"
                     :value="category"
@@ -114,7 +145,7 @@
                 </v-checkbox>
                 <v-combobox
                     v-model="dialog.selectedLanguage"
-                    :items="dialog.allLanguages"
+                    :items="allLanguages"
                     label="Language"
                 ></v-combobox>
             </div>            
@@ -131,38 +162,22 @@
                     @click="closeWithOk"
                 >Ok
                 </v-btn>
-                <v-dialog 
-                    width="500"
-                    v-if="dialog.success">
-                    <v-card title="Success">
-                        <v-card-text>
-                            {{ dialog.success }}
-                        </v-card-text>
-                        <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <v-btn
-                                text="Close"
-                                @click="dialog.success = ''"
-                            ></v-btn>
-                        </v-card-actions>
-                    </v-card>
-                </v-dialog>
-                <v-dialog 
-                    width="500"
-                    v-if="dialog.error">
-                    <v-card title="Error">
-                        <v-card-text>
-                            {{ dialog.error }}
-                        </v-card-text>
-                        <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <v-btn
-                                text="Close"
-                                @click="dialog.error = ''"
-                            ></v-btn>
-                        </v-card-actions>
-                    </v-card>
-                </v-dialog>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+    <v-dialog 
+        width="500"
+        v-model="statusDialog.isVisible">
+        <v-card :title="statusDialog.status === 'error' ? 'Error' : 'Success'">
+            <v-card-text> 
+                {{ statusDialog.message }}
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                    text="Close"
+                    @click="closeStatusDialog"
+                ></v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>

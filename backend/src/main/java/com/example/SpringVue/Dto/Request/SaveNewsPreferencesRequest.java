@@ -11,7 +11,7 @@ import java.util.List;
 @ToString
 @Getter
 @Setter
-public class NewsPreferencesRequest {
+public class SaveNewsPreferencesRequest {
 
     private String language;
 

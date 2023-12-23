@@ -12,32 +12,37 @@
 
         try{
 
-            const response = await fetch('http://localhost:8090/api/v1/user/get-news',{
-                method : "GET",
-                headers : {
-                    "Authorization" : `Bearer ${auth.token}`
-                }
-            });
-
-            if(response.status == 401) {
-                auth.logout();
-            }
-
-            const parsedResponse = await response.json();
-
-            if(response.status == 200) {
-                articles.value = parsedResponse;
-            
-            } else {
-                error.value = parsedResponse.message;
-            }
+            await fetchArticles()
 
         }catch(e) {
+
             error.value = e;
+
         }
 
-
     })
+
+    const fetchArticles = async () => {
+        const response = await fetch('http://localhost:8090/api/v1/user/get-news',{
+            method : "GET",
+            headers : {
+                "Authorization" : `Bearer ${auth.token}`
+            }
+        });
+
+        if(response.status == 401) {
+            auth.logout();
+        }
+
+        const parsedResponse = await response.json();
+
+        if(response.status == 200) {
+            articles.value = parsedResponse;
+        
+        } else {
+            throw new Error(parsedResponse.message)
+        }
+    }
 </script>
 <template>
     <div class="mx-auto" style="width:75%;">
@@ -47,7 +52,8 @@
                 <h2 class="text-h4 mt-3">Most Popular News Around the World</h2>
             </div>
             <div>
-                <NewsPreferences>
+                <NewsPreferences
+                    :fetchNewArticles="fetchArticles">
                 </NewsPreferences>
             </div>
         </div>
