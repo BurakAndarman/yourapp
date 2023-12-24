@@ -1,4 +1,6 @@
 <script setup>
+    import default_image from '../assets/default_news_image.jpg';
+
     const article = defineProps({
         imageUrl: String,
         title: String,
@@ -10,13 +12,13 @@
 <template>
     <v-card
       class="d-flex flex-column"
-      max-width="400"
+      width="400"
     >
       <v-img
         class="align-end text-white"
         height="200"
         gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
-        :src="article.imageUrl"
+        :src="article.imageUrl || default_image"
         cover
       >
         <v-card-title>{{ article.title }}</v-card-title>
@@ -26,7 +28,7 @@
       </v-card-subtitle>
       <v-card-text>
         <div>
-          {{ article.description }}
+          {{ article.description || article.title }}
         </div>
       </v-card-text>
       <v-spacer>

@@ -1,8 +1,11 @@
 <script setup>
     import { reactive } from 'vue';
     import { useAuthStore } from '../store/auth';
+    import { useStatusStore } from '../store/status';
 
     const auth = useAuthStore()
+
+    const statusDialog = useStatusStore()
 
     const props = defineProps({
         fetchNewArticles: Function
@@ -11,16 +14,8 @@
     const dialog = reactive({
         isVisible: false,
         selectedCategories: [],
-        selectedLanguage: '',
-        error: '',
-        success : ''
+        selectedLanguage: ''
     });
-
-    const statusDialog = reactive({
-        isVisible: false,
-        message: '',
-        status: ''
-    })
 
     const allCategories = ['business','entertainment','health','science','sports','technology'];
     const allLanguages = ['en','de','fr','it','ru','tr'];
@@ -55,9 +50,7 @@
             }
 
         } catch(e) {
-            statusDialog.status = 'error';
-            statusDialog.message = e;
-            statusDialog.isVisible = true;
+            statusDialog.openStatusDialog(e,'error')
         }
 
     }
@@ -87,9 +80,7 @@
             if(response.status == 200) {
                 const successResponse = await response.text()
 
-                statusDialog.status = 'success';
-                statusDialog.message = successResponse;
-                statusDialog.isVisible = true;
+                statusDialog.openStatusDialog(successResponse,'success')
 
                 props.fetchNewArticles();
             
@@ -100,19 +91,13 @@
             }
 
         } catch(e) {
-            statusDialog.status = 'error';
-            statusDialog.message = e;
-            statusDialog.isVisible = true;
+
+            statusDialog.openStatusDialog(e,'error')
 
         }
 
     }
 
-    const closeStatusDialog = () => {
-        statusDialog.isVisible = false;
-        statusDialog.message = '';
-        statusDialog.status = '';
-    }
 </script>
 <template>
     <v-btn
@@ -131,23 +116,29 @@
         >
             <v-toolbar
                 color="cyan-darken-4"
-                title="Choose Categories"
+                title="News Preferences"
             ></v-toolbar>
             <div class="ma-4">
-                <v-checkbox v-for="(category,index) in allCategories"
+                <div>
+                    <div class="text-center text-cyan-darken-4 font-weight-bold my-1">Categories</div>
+                    <v-checkbox v-for="(category,index) in allCategories"
                     v-model="dialog.selectedCategories"
                     :label="category"
                     :value="category"
                     color="cyan-darken-4"
                     :key="index"
                     hide-details
-                >
-                </v-checkbox>
-                <v-combobox
+                    >
+                    </v-checkbox>
+                </div>
+                <div>
+                    <div class="text-center text-cyan-darken-4 font-weight-bold mt-1 mb-5">Languages</div>
+                    <v-select
                     v-model="dialog.selectedLanguage"
                     :items="allLanguages"
                     label="Language"
-                ></v-combobox>
+                    ></v-select>
+                </div>
             </div>            
             <v-card-actions class="justify-end">
                 <v-btn
@@ -162,22 +153,6 @@
                     @click="closeWithOk"
                 >Ok
                 </v-btn>
-            </v-card-actions>
-        </v-card>
-    </v-dialog>
-    <v-dialog 
-        width="500"
-        v-model="statusDialog.isVisible">
-        <v-card :title="statusDialog.status === 'error' ? 'Error' : 'Success'">
-            <v-card-text> 
-                {{ statusDialog.message }}
-            </v-card-text>
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn
-                    text="Close"
-                    @click="closeStatusDialog"
-                ></v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>

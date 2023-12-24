@@ -57,7 +57,7 @@
                 </NewsPreferences>
             </div>
         </div>
-        <div class="my-10 d-flex flex-wrap justify-space-between ga-8">
+        <div v-if="articles.length" class="my-10 d-flex flex-wrap justify-space-between ga-8">
             <ArticleCard
                 v-for="(article, index) in articles"
                 :imageUrl="article.urlToImage"
@@ -68,6 +68,12 @@
                 :key="index"
             >
             </ArticleCard>
+        </div>
+        <div v-else class="mt-10 d-flex justify-center">
+            <div class="d-flex flex-column justify-center align-center ga-3">
+                <v-progress-circular color="cyan-darken-4" indeterminate :size="50"></v-progress-circular>
+                <p class="text-cyan-darken-4">Loading</p>
+            </div>           
         </div>
     </div>    
 </template>

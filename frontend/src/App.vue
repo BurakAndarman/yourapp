@@ -1,5 +1,6 @@
 <script setup>
   import { useAuthStore } from '@/store/auth';
+  import StatusDialog from '@/components/StatusDialog.vue';
 
   const auth = useAuthStore()
 
@@ -30,6 +31,7 @@
         Logout
       </v-btn>
     </v-toolbar>
+    <StatusDialog/>
     <RouterView/>
 </template>
 

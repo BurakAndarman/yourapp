@@ -12,10 +12,10 @@ import com.example.SpringVue.Repo.UserRepository;
 import com.example.SpringVue.Dto.Request.SaveUserRequest;
 import com.example.SpringVue.Service.NewsService;
 import com.example.SpringVue.Service.UserService;
+import com.example.SpringVue.Utils.EvictCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
-import javax.cache.CacheManager;
 
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,14 +40,14 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    private final CacheManager cacheManager;
+    private final EvictCache evictCache;
 
-    public UserServiceImpl(UserDetailsManager userDetailsManager, NewsService newsService, NewsPreferencesRepository newsPreferencesRepository, UserRepository userRepository, CacheManager cacheManager){
+    public UserServiceImpl(UserDetailsManager userDetailsManager, NewsService newsService, NewsPreferencesRepository newsPreferencesRepository, UserRepository userRepository, EvictCache evictCache){
         this.userDetailsManager = userDetailsManager;
         this.newsService = newsService;
         this.newsPreferencesRepository = newsPreferencesRepository;
         this.userRepository = userRepository;
-        this.cacheManager = cacheManager;
+        this.evictCache = evictCache;
     }
 
     @Override
@@ -113,12 +113,11 @@ public class UserServiceImpl implements UserService {
 
         newsPreferencesRepository.save(newsPreferences);
 
-        cacheManager.getCache("userNewsCache").remove(userName);
+        evictCache.evictUserNews(userName);
 
         return "Changes recorded successfully";
 
     }
-
 
     @Cacheable(value = "userNewsCache", key = "#userName")
     @Override
@@ -143,7 +142,7 @@ public class UserServiceImpl implements UserService {
             TopHeadlines topHeadlines = newsService.getTopHeadlines(preferredLanguage);
 
             if(!topHeadlines.getArticles().isEmpty()) {
-                articles.addAll(topHeadlines.getArticles().stream().filter(article -> article.getDescription() != "[Removed]").limit(12).toList());
+                articles.addAll(topHeadlines.getArticles().stream().limit(12).toList());
             }
 
             return articles;
@@ -156,11 +155,13 @@ public class UserServiceImpl implements UserService {
             TopHeadlines topHeadlines = newsService.getTopHeadlines(preferredTopic,preferredLanguage);
 
             if(!topHeadlines.getArticles().isEmpty()) {
-                articles.addAll(topHeadlines.getArticles().stream().filter(article -> article.getDescription() != "[Removed]").limit(12).toList());
+                articles.addAll(topHeadlines.getArticles().stream().limit(6).toList());
             }
 
         }
 
         return articles;
     }
+
+
 }
