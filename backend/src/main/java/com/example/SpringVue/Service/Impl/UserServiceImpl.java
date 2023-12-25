@@ -8,6 +8,7 @@ import com.example.SpringVue.Entity.NewsPreferences;
 import com.example.SpringVue.Exception.DuplicateUsername;
 import com.example.SpringVue.Exception.NewsPreferenceNotFound;
 import com.example.SpringVue.Repo.NewsPreferencesRepository;
+import com.example.SpringVue.Repo.PlansRepository;
 import com.example.SpringVue.Repo.UserRepository;
 import com.example.SpringVue.Dto.Request.SaveUserRequest;
 import com.example.SpringVue.Service.NewsService;
@@ -40,13 +41,16 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    private final PlansRepository plansRepository;
+
     private final EvictCache evictCache;
 
-    public UserServiceImpl(UserDetailsManager userDetailsManager, NewsService newsService, NewsPreferencesRepository newsPreferencesRepository, UserRepository userRepository, EvictCache evictCache){
+    public UserServiceImpl(UserDetailsManager userDetailsManager, NewsService newsService, NewsPreferencesRepository newsPreferencesRepository, UserRepository userRepository, PlansRepository plansRepository, EvictCache evictCache){
         this.userDetailsManager = userDetailsManager;
         this.newsService = newsService;
         this.newsPreferencesRepository = newsPreferencesRepository;
         this.userRepository = userRepository;
+        this.plansRepository = plansRepository;
         this.evictCache = evictCache;
     }
 
