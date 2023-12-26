@@ -1,10 +1,8 @@
 package com.example.SpringVue.Entity;
 
-import com.example.SpringVue.Utils.Tags;
+import com.example.SpringVue.Utils.KanbanList;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.Arrays;
 
 @Entity
 @Table(name = "plans")
@@ -26,12 +24,16 @@ public class Plans {
     @Column(name="content",nullable = false)
     private String content;
 
-    @Enumerated
     @Column(name="tags")
-    private Tags tags = Tags.valueOf("TODO");
+    private String tags = "";
+
+    @Enumerated(EnumType.STRING)
+    @Column(name="kanban_list",nullable = false)
+    private KanbanList kanbanList = KanbanList.TODO;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "username", nullable = false)
+    @ToString.Exclude
     private User user;
 
     public Plans(String title, String content, User user) {
@@ -39,5 +41,6 @@ public class Plans {
         this.content = content;
         this.user = user;
     }
+
 }
 

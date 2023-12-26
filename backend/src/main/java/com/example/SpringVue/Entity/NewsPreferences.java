@@ -27,6 +27,7 @@ public class NewsPreferences {
     @OneToOne(cascade = CascadeType.ALL)
     @MapsId
     @JoinColumn(name = "username")
+    @ToString.Exclude
     private User user;
 
     public NewsPreferences(String userName, User user) {

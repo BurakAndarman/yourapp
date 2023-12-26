@@ -1,6 +1,5 @@
 package com.example.SpringVue.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -27,11 +26,11 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
-    @JsonIgnore
+    @ToString.Exclude
     private NewsPreferences newsPreferences;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonIgnore
+    @ToString.Exclude
     private Set<Plans> plans;
 
 }
