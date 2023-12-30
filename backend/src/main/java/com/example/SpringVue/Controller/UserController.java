@@ -1,9 +1,11 @@
 package com.example.SpringVue.Controller;
 
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.Article;
-import com.example.SpringVue.Dto.Request.SaveNewsPreferencesRequest;
+import com.example.SpringVue.Dto.Request.UpdateNewsPreferencesRequest;
+import com.example.SpringVue.Dto.Request.SavePlansRequest;
 import com.example.SpringVue.Dto.Request.SaveUserRequest;
 import com.example.SpringVue.Dto.Response.GetNewsPreferencesResponse;
+import com.example.SpringVue.Dto.Response.GetPlansResponse;
 import com.example.SpringVue.Service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,13 +50,31 @@ public class UserController {
 
     }
 
-    @PostMapping("/news-preferences")
-    public ResponseEntity<String> saveNewsPreferences (@RequestBody SaveNewsPreferencesRequest saveNewsPreferencesRequest, Authentication authentication) {
+    @PutMapping("/news-preferences")
+    public ResponseEntity<String> updateNewsPreferences (@RequestBody UpdateNewsPreferencesRequest updateNewsPreferencesRequest, Authentication authentication) {
 
-        String saveMessage = userService.saveNewsPreferences(saveNewsPreferencesRequest, authentication.getName());
+        String saveMessage = userService.updateNewsPreferences(updateNewsPreferencesRequest, authentication.getName());
 
         return new ResponseEntity<>(saveMessage, HttpStatus.OK);
 
     }
+
+    @GetMapping("/plans")
+    public ResponseEntity<GetPlansResponse> getPlans(Authentication authentication) {
+
+        GetPlansResponse getPlansResponse = userService.getPlans(authentication.getName());
+
+        return new ResponseEntity<>(getPlansResponse, HttpStatus.OK);
+
+    }
+
+    @PostMapping("/plans")
+    public ResponseEntity<String> savePlans(SavePlansRequest savePlansRequest, Authentication authentication) {
+
+        String saveMessage = userService.savePlans(savePlansRequest, authentication.getName());
+
+        return new ResponseEntity<>(saveMessage, HttpStatus.CREATED);
+    }
+
 
 }

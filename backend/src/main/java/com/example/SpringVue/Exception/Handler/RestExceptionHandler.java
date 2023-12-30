@@ -4,6 +4,7 @@ import com.example.SpringVue.Exception.DuplicateUsername;
 import com.example.SpringVue.Exception.NewsPreferenceNotFound;
 import com.example.SpringVue.Exception.Response.ErrorResponse;
 import com.example.SpringVue.Exception.Response.HttpErrorResponse;
+import com.example.SpringVue.Exception.UserNotFound;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -28,6 +29,19 @@ public class RestExceptionHandler {
 
         error.setStatus(HttpStatus.BAD_REQUEST.value());
         error.setMessage(newsPreferenceNotFound.getMessage()+" (Username that caused error: "+newsPreferenceNotFound.getCausedUserName()+")");
+        error.setTimeStamp(System.currentTimeMillis());
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleException (UserNotFound userNotFound) {
+
+        ErrorResponse error = new ErrorResponse();
+
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+
+        error.setMessage(userNotFound.getMessage());
         error.setTimeStamp(System.currentTimeMillis());
 
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);

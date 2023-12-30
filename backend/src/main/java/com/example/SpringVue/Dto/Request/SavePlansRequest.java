@@ -1,5 +1,6 @@
 package com.example.SpringVue.Dto.Request;
 
+import com.example.SpringVue.Utils.KanbanList;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,10 +12,14 @@ import java.util.List;
 @ToString
 @Getter
 @Setter
-public class SaveNewsPreferencesRequest {
+public class SavePlansRequest {
 
-    private String language;
+    private String title;
 
-    private List<String> interestedTopics;
+    private String content;
+
+    private List<String> tags;
+
+    private KanbanList kanbanList;
 
 }

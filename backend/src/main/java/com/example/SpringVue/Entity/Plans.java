@@ -36,9 +36,11 @@ public class Plans {
     @ToString.Exclude
     private User user;
 
-    public Plans(String title, String content, User user) {
+    public Plans(String title, String content, String tags, KanbanList kanbanList, User user) {
         this.title = title;
         this.content = content;
+        this.tags = tags;
+        this.kanbanList = kanbanList;
         this.user = user;
     }
 

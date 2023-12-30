@@ -2,11 +2,16 @@ package com.example.SpringVue.Service.Impl;
 
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.Article;
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.TopHeadlines;
-import com.example.SpringVue.Dto.Request.SaveNewsPreferencesRequest;
+import com.example.SpringVue.Dto.PlansDto;
+import com.example.SpringVue.Dto.Request.UpdateNewsPreferencesRequest;
+import com.example.SpringVue.Dto.Request.SavePlansRequest;
 import com.example.SpringVue.Dto.Response.GetNewsPreferencesResponse;
+import com.example.SpringVue.Dto.Response.GetPlansResponse;
 import com.example.SpringVue.Entity.NewsPreferences;
+import com.example.SpringVue.Entity.Plans;
 import com.example.SpringVue.Exception.DuplicateUsername;
 import com.example.SpringVue.Exception.NewsPreferenceNotFound;
+import com.example.SpringVue.Exception.UserNotFound;
 import com.example.SpringVue.Repo.NewsPreferencesRepository;
 import com.example.SpringVue.Repo.PlansRepository;
 import com.example.SpringVue.Repo.UserRepository;
@@ -14,6 +19,7 @@ import com.example.SpringVue.Dto.Request.SaveUserRequest;
 import com.example.SpringVue.Service.NewsService;
 import com.example.SpringVue.Service.UserService;
 import com.example.SpringVue.Utils.EvictCache;
+import com.example.SpringVue.Utils.KanbanList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -100,13 +106,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String saveNewsPreferences(SaveNewsPreferencesRequest saveNewsPreferencesRequest, String userName) {
+    public String updateNewsPreferences(UpdateNewsPreferencesRequest updateNewsPreferencesRequest, String userName) {
 
-        String language = saveNewsPreferencesRequest.getLanguage();
+        String language = updateNewsPreferencesRequest.getLanguage();
         String interestedTopics = "";
 
-        if(!saveNewsPreferencesRequest.getInterestedTopics().isEmpty()) {
-            interestedTopics = String.join(",", saveNewsPreferencesRequest.getInterestedTopics());
+        if(!updateNewsPreferencesRequest.getInterestedTopics().isEmpty()) {
+            interestedTopics = String.join(",", updateNewsPreferencesRequest.getInterestedTopics());
         }
 
         NewsPreferences newsPreferences = new NewsPreferences(
@@ -121,6 +127,66 @@ public class UserServiceImpl implements UserService {
 
         return "Changes recorded successfully";
 
+    }
+
+    @Override
+    public GetPlansResponse getPlans(String userName) {
+
+        Optional<com.example.SpringVue.Entity.User> user = userRepository.findById(userName);
+
+        if(user.isEmpty()) {
+            throw new UserNotFound("Invalid username");
+        }
+
+        List<Plans> plans = plansRepository.findAllByUser(user.get());
+
+        List<PlansDto> plansDtos = plans.stream().map(userPlan -> {
+            List<String> tags = new ArrayList<>();
+
+            if(!userPlan.getTags().isEmpty()) {
+                tags.addAll(Arrays.stream(userPlan.getTags().split(",")).toList());
+            }
+
+            return new PlansDto(
+                   userPlan.getTitle(),
+                   userPlan.getContent(),
+                   tags,
+                   userPlan.getKanbanList()
+            );
+        }).toList();
+
+        List<PlansDto> todo = plansDtos.stream().filter(userPlanDto -> userPlanDto.getKanbanList() == KanbanList.TODO).toList();
+        List<PlansDto> thisWeek = plansDtos.stream().filter(userPlanDto -> userPlanDto.getKanbanList() == KanbanList.THIS_WEEK).toList();
+        List<PlansDto> today = plansDtos.stream().filter(userPlanDto -> userPlanDto.getKanbanList() == KanbanList.TODAY).toList();
+        List<PlansDto> done = plansDtos.stream().filter(userPlanDto -> userPlanDto.getKanbanList() == KanbanList.DONE).toList();
+
+        return new GetPlansResponse(todo, thisWeek, today, done);
+    }
+
+    @Override
+    public String savePlans(SavePlansRequest savePlansRequest, String userName) {
+
+        Optional<com.example.SpringVue.Entity.User> user = userRepository.findById(userName);
+
+        if(user.isEmpty()) {
+            throw new UserNotFound("Invalid username");
+        }
+
+        String tags = "";
+
+        if(!savePlansRequest.getTags().isEmpty()) {
+            tags = String.join(",", savePlansRequest.getTags());
+        }
+
+        plansRepository.save(new Plans(
+                savePlansRequest.getTitle(),
+                savePlansRequest.getContent(),
+                tags,
+                savePlansRequest.getKanbanList(),
+                user.get()
+        ));
+
+        return "New plan recorded successfully";
     }
 
     @Cacheable(value = "userNewsCache", key = "#userName")

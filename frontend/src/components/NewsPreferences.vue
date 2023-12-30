@@ -62,7 +62,7 @@
             dialog.isVisible = false;
 
             const response = await fetch('http://localhost:8090/api/v1/user/news-preferences',{
-                method : "POST",
+                method : "PUT",
                 headers : {
                     "Content-Type" : "application/json",
                     "Authorization" : `Bearer ${auth.token}`
