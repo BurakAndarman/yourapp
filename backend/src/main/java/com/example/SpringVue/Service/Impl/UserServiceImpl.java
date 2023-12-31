@@ -130,7 +130,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public GetPlansResponse getPlans(String userName) {
+    public List<PlansDto> getPlans(String userName) {
 
         Optional<com.example.SpringVue.Entity.User> user = userRepository.findById(userName);
 
@@ -155,12 +155,7 @@ public class UserServiceImpl implements UserService {
             );
         }).toList();
 
-        List<PlansDto> todo = plansDtos.stream().filter(userPlanDto -> userPlanDto.getKanbanList() == KanbanList.TODO).toList();
-        List<PlansDto> thisWeek = plansDtos.stream().filter(userPlanDto -> userPlanDto.getKanbanList() == KanbanList.THIS_WEEK).toList();
-        List<PlansDto> today = plansDtos.stream().filter(userPlanDto -> userPlanDto.getKanbanList() == KanbanList.TODAY).toList();
-        List<PlansDto> done = plansDtos.stream().filter(userPlanDto -> userPlanDto.getKanbanList() == KanbanList.DONE).toList();
-
-        return new GetPlansResponse(todo, thisWeek, today, done);
+        return plansDtos;
     }
 
     @Override

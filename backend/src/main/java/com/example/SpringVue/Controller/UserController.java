@@ -1,11 +1,11 @@
 package com.example.SpringVue.Controller;
 
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.Article;
+import com.example.SpringVue.Dto.PlansDto;
 import com.example.SpringVue.Dto.Request.UpdateNewsPreferencesRequest;
 import com.example.SpringVue.Dto.Request.SavePlansRequest;
 import com.example.SpringVue.Dto.Request.SaveUserRequest;
 import com.example.SpringVue.Dto.Response.GetNewsPreferencesResponse;
-import com.example.SpringVue.Dto.Response.GetPlansResponse;
 import com.example.SpringVue.Service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,16 +60,16 @@ public class UserController {
     }
 
     @GetMapping("/plans")
-    public ResponseEntity<GetPlansResponse> getPlans(Authentication authentication) {
+    public ResponseEntity<List<PlansDto>> getPlans(Authentication authentication) {
 
-        GetPlansResponse getPlansResponse = userService.getPlans(authentication.getName());
+        List<PlansDto> plansDtoList = userService.getPlans(authentication.getName());
 
-        return new ResponseEntity<>(getPlansResponse, HttpStatus.OK);
+        return new ResponseEntity<>(plansDtoList, HttpStatus.OK);
 
     }
 
     @PostMapping("/plans")
-    public ResponseEntity<String> savePlans(SavePlansRequest savePlansRequest, Authentication authentication) {
+    public ResponseEntity<String> savePlans(@RequestBody SavePlansRequest savePlansRequest, Authentication authentication) {
 
         String saveMessage = userService.savePlans(savePlansRequest, authentication.getName());
 

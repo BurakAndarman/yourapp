@@ -1,12 +1,13 @@
 <script setup>
     import { useAuthStore } from '../store/auth';
+    import { useStatusStore } from '../store/status';
     import { onMounted, ref } from 'vue';
     import ArticleCard from '../components/ArticleCard.vue';
     import NewsPreferences from '../components/NewsPreferences.vue';
 
     const auth = useAuthStore()
+    const statusDialog = useStatusStore()
     const articles = ref([])
-    const error = ref('')
 
     onMounted(async () => {
 
@@ -16,7 +17,7 @@
 
         }catch(e) {
 
-            error.value = e;
+            statusDialog.openStatusDialog(e,'error')
 
         }
 

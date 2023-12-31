@@ -22,4 +22,19 @@ public class PlansDto {
 
     private KanbanList kanbanList;
 
+    // Fields to be used in client for indicating certain actions
+
+    private boolean created = false;
+
+    private boolean changed = false;
+
+    private boolean deleted = false;
+
+    public PlansDto(String title, String content, List<String> tags, KanbanList kanbanList) {
+        this.title = title;
+        this.content = content;
+        this.tags = tags;
+        this.kanbanList = kanbanList;
+    }
+
 }
