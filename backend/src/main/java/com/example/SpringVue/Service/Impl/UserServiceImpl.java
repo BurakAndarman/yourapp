@@ -148,6 +148,7 @@ public class UserServiceImpl implements UserService {
             }
 
             return new PlansDto(
+                   userPlan.getId(),
                    userPlan.getTitle(),
                    userPlan.getContent(),
                    tags,

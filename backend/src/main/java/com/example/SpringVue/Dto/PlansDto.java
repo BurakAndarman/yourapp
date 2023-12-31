@@ -14,6 +14,8 @@ import java.util.List;
 @Setter
 public class PlansDto {
 
+    private int id;
+
     private String title;
 
     private String content;
@@ -30,7 +32,8 @@ public class PlansDto {
 
     private boolean deleted = false;
 
-    public PlansDto(String title, String content, List<String> tags, KanbanList kanbanList) {
+    public PlansDto(int id,String title, String content, List<String> tags, KanbanList kanbanList) {
+        this.id = id;
         this.title = title;
         this.content = content;
         this.tags = tags;
