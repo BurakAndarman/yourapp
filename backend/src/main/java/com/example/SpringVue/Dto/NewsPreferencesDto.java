@@ -1,4 +1,4 @@
-package com.example.SpringVue.Dto.Response;
+package com.example.SpringVue.Dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,7 +11,7 @@ import java.util.List;
 @ToString
 @Getter
 @Setter
-public class GetNewsPreferencesResponse {
+public class NewsPreferencesDto {
 
     private String language;
 

@@ -2,11 +2,9 @@ package com.example.SpringVue.Service.Impl;
 
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.Article;
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.TopHeadlines;
+import com.example.SpringVue.Dto.NewsPreferencesDto;
 import com.example.SpringVue.Dto.PlansDto;
-import com.example.SpringVue.Dto.Request.UpdateNewsPreferencesRequest;
 import com.example.SpringVue.Dto.Request.SavePlansRequest;
-import com.example.SpringVue.Dto.Response.GetNewsPreferencesResponse;
-import com.example.SpringVue.Dto.Response.GetPlansResponse;
 import com.example.SpringVue.Entity.NewsPreferences;
 import com.example.SpringVue.Entity.Plans;
 import com.example.SpringVue.Exception.DuplicateUsername;
@@ -19,7 +17,6 @@ import com.example.SpringVue.Dto.Request.SaveUserRequest;
 import com.example.SpringVue.Service.NewsService;
 import com.example.SpringVue.Service.UserService;
 import com.example.SpringVue.Utils.EvictCache;
-import com.example.SpringVue.Utils.KanbanList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -87,7 +84,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public GetNewsPreferencesResponse getNewsPreferences(String userName) {
+    public NewsPreferencesDto getNewsPreferences(String userName) {
 
         Optional<NewsPreferences> newsPreferences = newsPreferencesRepository.findById(userName);
 
@@ -102,17 +99,17 @@ public class UserServiceImpl implements UserService {
             interestedTopics.addAll(Arrays.stream(newsPreferences.get().getInterestedTopics().split(",")).toList());
         }
 
-        return new GetNewsPreferencesResponse(language, interestedTopics);
+        return new NewsPreferencesDto(language, interestedTopics);
     }
 
     @Override
-    public String updateNewsPreferences(UpdateNewsPreferencesRequest updateNewsPreferencesRequest, String userName) {
+    public String updateNewsPreferences(NewsPreferencesDto newsPreferencesDto, String userName) {
 
-        String language = updateNewsPreferencesRequest.getLanguage();
+        String language = newsPreferencesDto.getLanguage();
         String interestedTopics = "";
 
-        if(!updateNewsPreferencesRequest.getInterestedTopics().isEmpty()) {
-            interestedTopics = String.join(",", updateNewsPreferencesRequest.getInterestedTopics());
+        if(!newsPreferencesDto.getInterestedTopics().isEmpty()) {
+            interestedTopics = String.join(",", newsPreferencesDto.getInterestedTopics());
         }
 
         NewsPreferences newsPreferences = new NewsPreferences(

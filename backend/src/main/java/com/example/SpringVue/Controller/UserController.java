@@ -1,11 +1,10 @@
 package com.example.SpringVue.Controller;
 
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.Article;
+import com.example.SpringVue.Dto.NewsPreferencesDto;
 import com.example.SpringVue.Dto.PlansDto;
-import com.example.SpringVue.Dto.Request.UpdateNewsPreferencesRequest;
 import com.example.SpringVue.Dto.Request.SavePlansRequest;
 import com.example.SpringVue.Dto.Request.SaveUserRequest;
-import com.example.SpringVue.Dto.Response.GetNewsPreferencesResponse;
 import com.example.SpringVue.Service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,18 +41,18 @@ public class UserController {
     }
 
     @GetMapping("/news-preferences")
-    public ResponseEntity<GetNewsPreferencesResponse> getNewsPreferences(Authentication authentication) {
+    public ResponseEntity<NewsPreferencesDto> getNewsPreferences(Authentication authentication) {
 
-        GetNewsPreferencesResponse getNewsPreferencesResponse = userService.getNewsPreferences(authentication.getName());
+        NewsPreferencesDto newsPreferencesDto = userService.getNewsPreferences(authentication.getName());
 
-        return new ResponseEntity<>(getNewsPreferencesResponse, HttpStatus.OK);
+        return new ResponseEntity<>(newsPreferencesDto, HttpStatus.OK);
 
     }
 
     @PutMapping("/news-preferences")
-    public ResponseEntity<String> updateNewsPreferences (@RequestBody UpdateNewsPreferencesRequest updateNewsPreferencesRequest, Authentication authentication) {
+    public ResponseEntity<String> updateNewsPreferences(@RequestBody NewsPreferencesDto newsPreferencesDto, Authentication authentication) {
 
-        String saveMessage = userService.updateNewsPreferences(updateNewsPreferencesRequest, authentication.getName());
+        String saveMessage = userService.updateNewsPreferences(newsPreferencesDto, authentication.getName());
 
         return new ResponseEntity<>(saveMessage, HttpStatus.OK);
 

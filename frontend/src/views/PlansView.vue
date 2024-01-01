@@ -1,11 +1,10 @@
 <script setup>
-    import { onMounted, reactive, ref } from 'vue';
+    import { onMounted, reactive } from 'vue';
     import { useAuthStore } from '../store/auth';
     import { useStatusStore } from '../store/status';
 
     const auth = useAuthStore()
     const statusDialog = useStatusStore()
-    const plans = ref([])
     const plansCategorized = reactive({
         "todo": [],
         "this_week": [],
@@ -30,9 +29,7 @@
             const parsedResponse = await response.json();
 
             if(response.status == 200) {
-                plans.value = parsedResponse;
-
-                categorizePlans()
+                categorizePlans(parsedResponse)
             
             } else {
                 throw new Error(parsedResponse.message)
@@ -44,11 +41,11 @@
         }
     })
 
-    const categorizePlans = () => {
-        plansCategorized.todo = plans.value.filter((plan) => plan.kanbanList == "TODO");
-        plansCategorized.this_week = plans.value.filter((plan) => plan.kanbanList == "THIS_WEEK");
-        plansCategorized.today = plans.value.filter((plan) => plan.kanbanList == "TODAY");
-        plansCategorized.done = plans.value.filter((plan) => plan.kanbanList == "DONE");
+    const categorizePlans = (plans) => {
+        plansCategorized.todo = plans.filter((plan) => plan.kanbanList == "TODO");
+        plansCategorized.this_week = plans.filter((plan) => plan.kanbanList == "THIS_WEEK");
+        plansCategorized.today = plans.filter((plan) => plan.kanbanList == "TODAY");
+        plansCategorized.done = plans.filter((plan) => plan.kanbanList == "DONE");
     }
 
 </script>
@@ -62,9 +59,7 @@
             <div>
             </div>
         </div>
-        <div v-if="plans.length">
-        </div>
-        <div v-else class="mt-10 d-flex justify-center">
+        <div class="mt-10 d-flex justify-center">
             <div class="d-flex flex-column justify-center align-center ga-3">
                 <v-progress-circular color="cyan-darken-4" indeterminate :size="50"></v-progress-circular>
                 <p class="text-cyan-darken-4">Loading</p>
