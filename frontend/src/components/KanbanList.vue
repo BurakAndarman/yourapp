@@ -1,39 +1,20 @@
 <script setup>
-    import { onMounted,ref } from 'vue';
     import ExpandedPlan from '../components/ExpandedPlan.vue';
     import { useExpandPlanStore } from '../store/expandPlan';
 
     const props = defineProps({
-        category: String,
+        title: String,
         plans: Object,
         planUtils: Object
     });
-
-    const listTitle = ref("");    
+  
     const expandPlan = useExpandPlanStore();
-
-    onMounted(() => {
-
-        if(props.category == 'todo') {
-            listTitle.value = "Todo";
-        
-        }else if(props.category == 'this_week') {
-            listTitle.value = "This Week";
-        
-        }else if(props.category == 'today') {
-            listTitle.value = "Today";
-
-        }else {
-            listTitle.value = "Done";
-        }
-
-    })
 
 </script>
 <template>
     <div class="w-100">
         <div class="text-center text-cyan-darken-4">
-            <h3 class="text-h5">{{listTitle}}</h3>
+            <h3 class="text-h5">{{props.title}}</h3>
         </div>
         <div v-if="plans.length">
             <v-card
@@ -65,7 +46,7 @@
             </v-card>
         </div>
         <div v-else class="pt-8 text-center text-disabled">
-            {{ `${listTitle} list is empty` }}
+            {{ `${props.title} list is empty` }}
         </div>
     </div>
 </template>

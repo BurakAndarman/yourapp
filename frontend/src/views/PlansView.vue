@@ -91,10 +91,10 @@
             </div>           
         </div>
         <div v-else class="my-10 d-flex justify-space-between ga-8">
-            <KanbanList category="todo" :plans="plansCategorized.todo" :planUtils="planUtils"/>
-            <KanbanList category="this_week" :plans="plansCategorized.this_week" :planUtils="planUtils"/>
-            <KanbanList category="today" :plans="plansCategorized.today" :planUtils="planUtils"/>
-            <KanbanList category="done" :plans="plansCategorized.done" :planUtils="planUtils"/>
+            <KanbanList title="Todo" :plans="plansCategorized.todo" :planUtils="planUtils"/>
+            <KanbanList title="This Week" :plans="plansCategorized.this_week" :planUtils="planUtils"/>
+            <KanbanList title="Today" :plans="plansCategorized.today" :planUtils="planUtils"/>
+            <KanbanList title="Done" :plans="plansCategorized.done" :planUtils="planUtils"/>
         </div>
     </div>  
 </template>
