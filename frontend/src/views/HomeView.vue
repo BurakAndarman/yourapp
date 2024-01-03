@@ -53,9 +53,7 @@
                 <h2 class="text-h4 mt-3">Most Popular News Around the World</h2>
             </div>
             <div>
-                <NewsPreferences
-                    :fetchNewArticles="fetchArticles">
-                </NewsPreferences>
+                <NewsPreferences :fetchNewArticles="fetchArticles"/>
             </div>
         </div>
         <div v-if="articles.length" class="my-10 d-flex flex-wrap justify-space-between ga-8">
@@ -67,8 +65,7 @@
                 :description="article.description"
                 :author="article.author"
                 :key="index"
-            >
-            </ArticleCard>
+            />
         </div>
         <div v-else class="mt-10 d-flex justify-center">
             <div class="d-flex flex-column justify-center align-center ga-3">

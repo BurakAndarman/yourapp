@@ -1,16 +1,28 @@
 <script setup>
-    import { onMounted, reactive } from 'vue';
+    import { onMounted, reactive, ref } from 'vue';
     import { useAuthStore } from '../store/auth';
     import { useStatusStore } from '../store/status';
+    import KanbanList from '../components/KanbanList.vue';
 
     const auth = useAuthStore()
     const statusDialog = useStatusStore()
+    const loading = ref(true)
+    const allPlans = ref([]);
+    const idList = ref([]);
     const plansCategorized = reactive({
         "todo": [],
         "this_week": [],
         "today": [],
         "done": []
     })
+    const planUtils = {
+        changeList : (id, newList) => {
+            const index = idList.value.indexOf(id);
+            allPlans.value[index].kanbanList = newList;
+            allPlans.value[index].changed = true;
+            categorizePlans();
+        }
+    }
 
     onMounted(async () => {
 
@@ -29,7 +41,11 @@
             const parsedResponse = await response.json();
 
             if(response.status == 200) {
-                categorizePlans(parsedResponse)
+                allPlans.value = parsedResponse
+
+                extractIdList()
+                categorizePlans()
+                loading.value = false
             
             } else {
                 throw new Error(parsedResponse.message)
@@ -41,11 +57,15 @@
         }
     })
 
-    const categorizePlans = (plans) => {
-        plansCategorized.todo = plans.filter((plan) => plan.kanbanList == "TODO");
-        plansCategorized.this_week = plans.filter((plan) => plan.kanbanList == "THIS_WEEK");
-        plansCategorized.today = plans.filter((plan) => plan.kanbanList == "TODAY");
-        plansCategorized.done = plans.filter((plan) => plan.kanbanList == "DONE");
+    const categorizePlans = () => {
+        plansCategorized.todo = allPlans.value.filter((plan) => plan.kanbanList == "TODO");
+        plansCategorized.this_week = allPlans.value.filter((plan) => plan.kanbanList == "THIS_WEEK");
+        plansCategorized.today = allPlans.value.filter((plan) => plan.kanbanList == "TODAY");
+        plansCategorized.done = allPlans.value.filter((plan) => plan.kanbanList == "DONE");
+    }
+
+    const extractIdList = () => {
+        idList.value = allPlans.value.map((plan) => plan.id);
     }
 
 </script>
@@ -57,13 +77,24 @@
                 <h2 class="text-h4 mt-3">Organize Your Plans</h2>
             </div>
             <div>
+                <v-btn
+                    color="cyan-darken-4"
+                    variant="tonal"
+                    icon="mdi-content-save">
+                </v-btn>
             </div>
         </div>
-        <div class="mt-10 d-flex justify-center">
+        <div v-if="loading" class="mt-10 d-flex justify-center">
             <div class="d-flex flex-column justify-center align-center ga-3">
                 <v-progress-circular color="cyan-darken-4" indeterminate :size="50"></v-progress-circular>
                 <p class="text-cyan-darken-4">Loading</p>
             </div>           
+        </div>
+        <div v-else class="my-10 d-flex justify-space-between ga-8">
+            <KanbanList category="todo" :plans="plansCategorized.todo" :planUtils="planUtils"/>
+            <KanbanList category="this_week" :plans="plansCategorized.this_week" :planUtils="planUtils"/>
+            <KanbanList category="today" :plans="plansCategorized.today" :planUtils="planUtils"/>
+            <KanbanList category="done" :plans="plansCategorized.done" :planUtils="planUtils"/>
         </div>
     </div>  
 </template>
