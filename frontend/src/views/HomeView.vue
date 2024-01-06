@@ -7,7 +7,15 @@
 
     const auth = useAuthStore()
     const statusDialog = useStatusStore()
-    const articles = ref([])
+    const articlesCategorized = ref({})
+    const topicIconMap = {
+        "science" : "brain",
+        "technology" : "laptop",
+        "sports" : "basketball",
+        "health" : "leaf",
+        "entertainment" : "ferris-wheel",
+        "business" : "briefcase"
+    }
 
     onMounted(async () => {
 
@@ -38,7 +46,7 @@
         const parsedResponse = await response.json();
 
         if(response.status == 200) {
-            articles.value = parsedResponse;
+            articlesCategorized.value = parsedResponse;
         
         } else {
             throw new Error(parsedResponse.message)
@@ -56,16 +64,32 @@
                 <NewsPreferences :fetchNewArticles="fetchArticles"/>
             </div>
         </div>
-        <div v-if="articles.length" class="my-10 d-flex flex-wrap justify-space-between ga-8">
-            <ArticleCard
-                v-for="(article, index) in articles"
-                :imageUrl="article.urlToImage"
-                :title="article.title"
-                :url="article.url"
-                :description="article.description"
-                :author="article.author"
-                :key="index"
-            />
+        <div v-if="Object.keys(articlesCategorized).length !== 0" class="my-10">
+            <div v-for="(articles, topic, index) in articlesCategorized" :key="index">
+                <div class="d-flex justify-center align-center my-16" v-if="topic != 'general'">
+                    <div class="w-100 ms-16">
+                        <hr class="topic-hr"/>
+                    </div>                    
+                    <h3 class="text-h5 font-weight-bold text-cyan-darken-4 mx-10 d-flex align-center ga-4">
+                        <v-icon :icon="'mdi-'+topicIconMap[topic]"></v-icon>
+                        <div>{{ topic.charAt(0).toUpperCase() + topic.slice(1) }}</div>
+                    </h3>
+                    <div class="w-100 me-16">
+                        <hr class="topic-hr"/>
+                    </div>                    
+                </div>
+                <div class="d-flex flex-wrap justify-space-between ga-8">
+                    <ArticleCard
+                        v-for="(article, index) in articles"
+                        :imageUrl="article.urlToImage"
+                        :title="article.title"
+                        :url="article.url"
+                        :description="article.description"
+                        :author="article.author"
+                        :key="index"
+                    />
+                </div>
+            </div>
         </div>
         <div v-else class="mt-10 d-flex justify-center">
             <div class="d-flex flex-column justify-center align-center ga-3">
@@ -75,3 +99,10 @@
         </div>
     </div>    
 </template>
+<style scoped>
+.topic-hr{
+    border:none;
+    height:3px;
+    background:#006064;
+}
+</style>

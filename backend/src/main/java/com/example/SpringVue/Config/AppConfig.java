@@ -15,6 +15,7 @@ import javax.cache.Caching;
 import javax.cache.spi.CachingProvider;
 import javax.cache.CacheManager;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
 
 @Configuration
@@ -29,8 +30,8 @@ public class AppConfig {
     @Bean
     public CacheManager EhcacheManager() {
 
-        CacheConfiguration<String, List> cacheConfig = CacheConfigurationBuilder
-                .newCacheConfigurationBuilder(String.class,List.class, ResourcePoolsBuilder.newResourcePoolsBuilder()
+        CacheConfiguration<String, HashMap> cacheConfig = CacheConfigurationBuilder
+                .newCacheConfigurationBuilder(String.class,HashMap.class, ResourcePoolsBuilder.newResourcePoolsBuilder()
                         .offheap(10, MemoryUnit.MB)
                         .build())
                 .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofHours(5)))
@@ -39,7 +40,7 @@ public class AppConfig {
         CachingProvider cachingProvider = Caching.getCachingProvider();
         CacheManager cacheManager = cachingProvider.getCacheManager();
 
-        javax.cache.configuration.Configuration<String,List> configuration = Eh107Configuration.fromEhcacheCacheConfiguration(cacheConfig);
+        javax.cache.configuration.Configuration<String, HashMap> configuration = Eh107Configuration.fromEhcacheCacheConfiguration(cacheConfig);
         cacheManager.createCache("userNewsCache",configuration);
 
         return cacheManager;

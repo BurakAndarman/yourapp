@@ -88,7 +88,7 @@
             <div class="d-flex flex-column justify-center align-center ga-3">
                 <v-progress-circular color="cyan-darken-4" indeterminate :size="50"></v-progress-circular>
                 <p class="text-cyan-darken-4">Loading</p>
-            </div>           
+            </div>
         </div>
         <div v-else class="my-10 d-flex justify-space-between ga-8">
             <KanbanList title="Todo" :plans="plansCategorized.todo" :planUtils="planUtils"/>

@@ -4,7 +4,6 @@ import com.example.SpringVue.Dto.NewsApi.TopHeadlines.Article;
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.TopHeadlines;
 import com.example.SpringVue.Dto.NewsPreferencesDto;
 import com.example.SpringVue.Dto.PlansDto;
-import com.example.SpringVue.Dto.Request.SavePlansRequest;
 import com.example.SpringVue.Entity.NewsPreferences;
 import com.example.SpringVue.Entity.Plans;
 import com.example.SpringVue.Exception.DuplicateUsername;
@@ -13,7 +12,7 @@ import com.example.SpringVue.Exception.UserNotFound;
 import com.example.SpringVue.Repo.NewsPreferencesRepository;
 import com.example.SpringVue.Repo.PlansRepository;
 import com.example.SpringVue.Repo.UserRepository;
-import com.example.SpringVue.Dto.Request.SaveUserRequest;
+import com.example.SpringVue.Dto.UserDto;
 import com.example.SpringVue.Service.NewsService;
 import com.example.SpringVue.Service.UserService;
 import com.example.SpringVue.Utils.EvictCache;
@@ -26,10 +25,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -58,17 +54,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String addUser(SaveUserRequest saveUserRequest) {
+    public String addUser(UserDto userDto) {
 
-        Optional<com.example.SpringVue.Entity.User> userCheck = userRepository.findById(saveUserRequest.getUserName());
+        Optional<com.example.SpringVue.Entity.User> userCheck = userRepository.findById(userDto.getUserName());
 
         if(userCheck.isPresent()) {
             throw new DuplicateUsername("There is already a user with the same username");
         }
 
         UserDetails user = User.withDefaultPasswordEncoder()
-                                .username(saveUserRequest.getUserName())
-                                .password(saveUserRequest.getPassword())
+                                .username(userDto.getUserName())
+                                .password(userDto.getPassword())
                                 .authorities("REGULAR") // There is only one type of user for now
                                 .build();
 
@@ -157,7 +153,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String savePlans(SavePlansRequest savePlansRequest, String userName) {
+    public String savePlan(PlansDto plansDto, String userName) {
 
         Optional<com.example.SpringVue.Entity.User> user = userRepository.findById(userName);
 
@@ -167,15 +163,15 @@ public class UserServiceImpl implements UserService {
 
         String tags = "";
 
-        if(!savePlansRequest.getTags().isEmpty()) {
-            tags = String.join(",", savePlansRequest.getTags());
+        if(!plansDto.getTags().isEmpty()) {
+            tags = String.join(",", plansDto.getTags());
         }
 
         plansRepository.save(new Plans(
-                savePlansRequest.getTitle(),
-                savePlansRequest.getContent(),
+                plansDto.getTitle(),
+                plansDto.getContent(),
                 tags,
-                savePlansRequest.getKanbanList(),
+                plansDto.getKanbanList(),
                 user.get()
         ));
 
@@ -184,7 +180,7 @@ public class UserServiceImpl implements UserService {
 
     @Cacheable(value = "userNewsCache", key = "#userName")
     @Override
-    public List<Article> getUserNews(String userName) {
+    public HashMap<String,List<Article>> getUserNews(String userName) {
 
         log.info("Trying to fetch data from 3rd party api");
 
@@ -199,16 +195,14 @@ public class UserServiceImpl implements UserService {
         String preferredLanguage = validatedNewsPreferences.getLanguage();
         Boolean topicsEmpty = validatedNewsPreferences.getInterestedTopics().isEmpty();
 
-        List<Article> articles = new ArrayList<>();
+        HashMap<String,List<Article>> articlesMap = new HashMap<>();
 
         if(topicsEmpty) {
             TopHeadlines topHeadlines = newsService.getTopHeadlines(preferredLanguage);
 
-            if(!topHeadlines.getArticles().isEmpty()) {
-                articles.addAll(topHeadlines.getArticles().stream().limit(12).toList());
-            }
+            articlesMap.put("general",topHeadlines.getArticles().stream().limit(12).toList());
 
-            return articles;
+            return articlesMap;
         }
 
         String[] preferredTopics = validatedNewsPreferences.getInterestedTopics().split(","); // Splitting comma separated topics
@@ -217,13 +211,11 @@ public class UserServiceImpl implements UserService {
 
             TopHeadlines topHeadlines = newsService.getTopHeadlines(preferredTopic,preferredLanguage);
 
-            if(!topHeadlines.getArticles().isEmpty()) {
-                articles.addAll(topHeadlines.getArticles().stream().limit(6).toList());
-            }
+            articlesMap.put(preferredTopic,topHeadlines.getArticles().stream().limit(6).toList());
 
         }
 
-        return articles;
+        return articlesMap;
     }
 
 

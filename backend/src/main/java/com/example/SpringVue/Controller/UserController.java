@@ -3,14 +3,14 @@ package com.example.SpringVue.Controller;
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.Article;
 import com.example.SpringVue.Dto.NewsPreferencesDto;
 import com.example.SpringVue.Dto.PlansDto;
-import com.example.SpringVue.Dto.Request.SavePlansRequest;
-import com.example.SpringVue.Dto.Request.SaveUserRequest;
+import com.example.SpringVue.Dto.UserDto;
 import com.example.SpringVue.Service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -25,17 +25,17 @@ public class UserController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<String> saveUser(@RequestBody SaveUserRequest saveUserRequest) {
+    public ResponseEntity<String> saveUser(@RequestBody UserDto userDto) {
 
-        String userName = userService.addUser(saveUserRequest);
+        String userName = userService.addUser(userDto);
 
         return new ResponseEntity<>(userName, HttpStatus.OK);
     }
 
     @GetMapping("/get-news")
-    public ResponseEntity<List<Article>> getNews(Authentication authentication) {
+    public ResponseEntity<HashMap<String,List<Article>>> getNews(Authentication authentication) {
 
-        List<Article> userArticles = userService.getUserNews(authentication.getName());
+        HashMap<String,List<Article>> userArticles = userService.getUserNews(authentication.getName());
 
         return new ResponseEntity<>(userArticles, HttpStatus.OK);
     }
@@ -68,9 +68,9 @@ public class UserController {
     }
 
     @PostMapping("/plans")
-    public ResponseEntity<String> savePlans(@RequestBody SavePlansRequest savePlansRequest, Authentication authentication) {
+    public ResponseEntity<String> savePlan(@RequestBody PlansDto plansDto, Authentication authentication) {
 
-        String saveMessage = userService.savePlans(savePlansRequest, authentication.getName());
+        String saveMessage = userService.savePlan(plansDto, authentication.getName());
 
         return new ResponseEntity<>(saveMessage, HttpStatus.CREATED);
     }

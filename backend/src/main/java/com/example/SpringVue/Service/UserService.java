@@ -3,15 +3,16 @@ package com.example.SpringVue.Service;
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.Article;
 import com.example.SpringVue.Dto.NewsPreferencesDto;
 import com.example.SpringVue.Dto.PlansDto;
-import com.example.SpringVue.Dto.Request.SavePlansRequest;
-import com.example.SpringVue.Dto.Request.SaveUserRequest;
+import com.example.SpringVue.Dto.UserDto;
+
+import java.util.HashMap;
 import java.util.List;
 
 public interface UserService {
 
-    String addUser(SaveUserRequest saveUserRequest);
+    String addUser(UserDto userDto);
 
-    List<Article> getUserNews(String userName);
+    HashMap<String,List<Article>> getUserNews(String userName);
 
     NewsPreferencesDto getNewsPreferences(String userName);
 
@@ -19,6 +20,6 @@ public interface UserService {
 
     List<PlansDto> getPlans(String userName);
 
-    String savePlans(SavePlansRequest savePlansRequest, String userName);
+    String savePlan(PlansDto plansDto, String userName);
 
 }

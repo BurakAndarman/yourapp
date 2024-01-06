@@ -1,4 +1,4 @@
-package com.example.SpringVue.Dto.Request;
+package com.example.SpringVue.Dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,7 @@ import lombok.ToString;
 @ToString
 @Getter
 @Setter
-public class SaveUserRequest {
+public class UserDto {
 
     private String userName;
 
