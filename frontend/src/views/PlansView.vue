@@ -6,21 +6,73 @@
 
     const auth = useAuthStore()
     const statusDialog = useStatusStore()
-    const loading = ref(true)
-    const allPlans = ref([]);
-    const idList = ref([]);
-    const plansCategorized = reactive({
-        "todo": [],
-        "this_week": [],
-        "today": [],
-        "done": []
+    const plans = reactive({
+        allPlans : [],
+        idsPlans : [],
+        categorizedPlans : {
+            todo : [],
+            this_week : [],
+            today : [],
+            done : []
+        },
+        expandedPlan : 0,
+        planModel : {
+            title : "",
+            content: "",
+            tags : [],
+            kanbanList : 'TODO',
+            created : false,
+            changed : false,
+            deleted : false
+        }
     })
-    const planUtils = {
+    const allLists = [
+        {
+            text : 'Todo',
+            value : 'TODO'
+        },{
+            text : 'This Week',
+            value : 'THIS_WEEK'
+        },{
+            text : 'Today',
+            value : 'TODAY'
+        },{
+            text : 'Done',
+            value : 'DONE'
+        }
+    ];
+    const addPlanVisible = ref(false);
+    const addPlanRules = {
+        length : len => v => (v || '').length <= len || `Invalid character length, required ${len} at max`,
+        required: v => !!v || 'This field is required',
+    };
+    const addPlanValid = ref(false);
+    const loading = ref(true);
+
+    // Functions to be used in KanbanList subcomponent
+    const plansUtils = {
         changeList : (id, newList) => {
-            const index = idList.value.indexOf(id);
-            allPlans.value[index].kanbanList = newList;
-            allPlans.value[index].changed = true;
+            const index = plans.idsPlans.indexOf(id);
+            plans.allPlans[index].kanbanList = newList;
+            plans.allPlans[index].changed = true;
             categorizePlans();
+        },
+        deletePlan : (id) => {
+            const index = plans.idsPlans.indexOf(id);
+            plans.allPlans[index].deleted = true;
+            categorizePlans();
+        },
+        changePlan : (id) => {
+
+        },
+        expandPlan : (id) => {
+            plans.expandedPlan = id;
+        },
+        hidePlan : () => {
+            plans.expandedPlan = 0;
+        },
+        currentExpandedPlan : () => {
+            return plans.expandedPlan;
         }
     }
 
@@ -41,7 +93,7 @@
             const parsedResponse = await response.json();
 
             if(response.status == 200) {
-                allPlans.value = parsedResponse
+                plans.allPlans = parsedResponse
 
                 extractIdList()
                 categorizePlans()
@@ -58,14 +110,18 @@
     })
 
     const categorizePlans = () => {
-        plansCategorized.todo = allPlans.value.filter((plan) => plan.kanbanList == "TODO");
-        plansCategorized.this_week = allPlans.value.filter((plan) => plan.kanbanList == "THIS_WEEK");
-        plansCategorized.today = allPlans.value.filter((plan) => plan.kanbanList == "TODAY");
-        plansCategorized.done = allPlans.value.filter((plan) => plan.kanbanList == "DONE");
+        plans.categorizedPlans.todo = plans.allPlans.filter((plan) => (plan.kanbanList === "TODO" && !plan.deleted));
+        plans.categorizedPlans.this_week = plans.allPlans.filter((plan) => (plan.kanbanList === "THIS_WEEK" && !plan.deleted));
+        plans.categorizedPlans.today = plans.allPlans.filter((plan) => (plan.kanbanList === "TODAY" && !plan.deleted));
+        plans.categorizedPlans.done = plans.allPlans.filter((plan) => (plan.kanbanList === "DONE" && !plan.deleted));
     }
 
     const extractIdList = () => {
-        idList.value = allPlans.value.map((plan) => plan.id);
+        plans.idsPlans = plans.allPlans.map((plan) => plan.id);
+    }
+
+    const addPlan = () => {
+
     }
 
 </script>
@@ -77,6 +133,13 @@
                 <h2 class="text-h4 mt-3">Organize Your Plans</h2>
             </div>
             <div>
+                <v-btn
+                    color="cyan-darken-4"    
+                    variant="tonal"
+                    icon="mdi-plus"
+                    class="me-3"
+                    @click="addPlanVisible = true">
+                </v-btn>
                 <v-btn
                     color="cyan-darken-4"
                     variant="tonal"
@@ -91,10 +154,71 @@
             </div>
         </div>
         <div v-else class="my-10 d-flex justify-space-between ga-8">
-            <KanbanList title="Todo" :plans="plansCategorized.todo" :planUtils="planUtils"/>
-            <KanbanList title="This Week" :plans="plansCategorized.this_week" :planUtils="planUtils"/>
-            <KanbanList title="Today" :plans="plansCategorized.today" :planUtils="planUtils"/>
-            <KanbanList title="Done" :plans="plansCategorized.done" :planUtils="planUtils"/>
+            <KanbanList title="Todo" :plans="plans.categorizedPlans.todo" :plansUtils="plansUtils"/>
+            <KanbanList title="This Week" :plans="plans.categorizedPlans.this_week" :plansUtils="plansUtils"/>
+            <KanbanList title="Today" :plans="plans.categorizedPlans.today" :plansUtils="plansUtils"/>
+            <KanbanList title="Done" :plans="plans.categorizedPlans.done" :plansUtils="plansUtils"/>
         </div>
+        <v-dialog
+            transition="dialog-bottom-transition"
+            v-model="addPlanVisible"
+            width="auto"
+        >
+            <v-card
+                width="400"
+            >
+                <v-form
+                    v-model="addPlanValid"
+                >
+                    <v-toolbar
+                        color="cyan-darken-4"
+                        title="Add Plan"
+                    ></v-toolbar>
+                    <div class="ma-4">
+                        <v-text-field
+                            v-model="plans.planModel.title"
+                            :rules="[addPlanRules.length(50),addPlanRules.required]"
+                            color="cyan-darken-4"
+                            label="Title"
+                            counter="50"
+                        >
+                        </v-text-field>
+                        <v-textarea
+                            v-model="plans.planModel.content"
+                            clearable
+                            clear-icon="mdi-close-circle"
+                            auto-grow
+                            counter="255"
+                            :rules="[addPlanRules.length(255),addPlanRules.required]"
+                            color="cyan-darken-4"
+                            label="Content"
+                            rows="3"
+                        ></v-textarea>
+                        <v-select
+                            v-model="plans.planModel.kanbanList"
+                            :items="allLists"
+                            item-value="value"
+                            item-title="text"
+                            label="List"
+                        ></v-select>
+                    </div>            
+                    <v-card-actions class="justify-end">
+                        <v-btn
+                            variant="text"
+                            color="cyan-darken-4"
+                            @click="addPlanVisible = false"
+                        >Close
+                        </v-btn>
+                        <v-btn
+                            :disabled="!addPlanValid"
+                            variant="tonal"
+                            color="cyan-darken-4"
+                            @click="addPlan()"
+                        >Ok
+                        </v-btn>
+                    </v-card-actions>
+                </v-form>
+            </v-card>
+        </v-dialog>
     </div>  
 </template>

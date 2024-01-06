@@ -76,7 +76,7 @@
                     </h3>
                     <div class="w-100 me-16">
                         <hr class="topic-hr"/>
-                    </div>                    
+                    </div>
                 </div>
                 <div class="d-flex flex-wrap justify-space-between ga-8">
                     <ArticleCard
