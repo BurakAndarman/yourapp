@@ -41,6 +41,9 @@
             value : 'DONE'
         }
     ];
+    const tags = [
+        'asdasd',"burak"
+    ];
     const addPlanVisible = ref(false);
     const addPlanRules = {
         length : len => v => (v || '').length <= len || `Invalid character length, required ${len} at max`,
@@ -201,6 +204,64 @@
                             item-title="text"
                             label="List"
                         ></v-select>
+                        <div class="d-flex ga-2">
+                            <v-select
+                                v-model="plans.planModel.tags"
+                                :items="tags"
+                                label="Tags"
+                                multiple
+                            >
+                                <template v-slot:selection="{item}">
+                                    <v-chip color="pink">
+                                        <span>{{ item.title }}</span>
+                                    </v-chip>
+                                </template>
+                            </v-select>
+                            <v-btn
+                                color="cyan-darken-4"
+                                variant="tonal"
+                                class="mt-3">
+                                Add
+                                <v-overlay
+                                    activator="parent"
+                                    location-strategy="connected"
+                                    scroll-strategy="block"
+                                >
+                                    <v-card class="pa-2">
+                                        <v-form>
+                                            <div class="d-flex ga-2">                                                
+                                                <div>
+                                                    <v-color-picker 
+                                                        :modes="['rgba']"
+                                                        hide-canvas 
+                                                        hide-inputs
+                                                        show-swatches>
+                                                    </v-color-picker>
+                                                </div>
+                                                <div class="d-flex flex-column justify-space-between align-end">
+                                                    <div>
+                                                        <v-text-field
+                                                            :rules="[addPlanRules.length(15),addPlanRules.required]"
+                                                            color="cyan-darken-4"
+                                                            style="width:250px;"
+                                                            label="Tag"
+                                                            counter="15"
+                                                        >
+                                                        </v-text-field>
+                                                    </div>
+                                                    <v-btn
+                                                        variant="tonal"
+                                                        color="cyan-darken-4"
+                                                        class="w-50"
+                                                    >OK
+                                                    </v-btn>
+                                                </div>
+                                            </div>
+                                        </v-form>
+                                    </v-card>
+                                </v-overlay>
+                            </v-btn>
+                        </div>
                     </div>            
                     <v-card-actions class="justify-end">
                         <v-btn
