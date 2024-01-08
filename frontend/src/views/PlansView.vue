@@ -4,8 +4,29 @@
     import { useStatusStore } from '../store/status';
     import KanbanList from '../components/KanbanList.vue';
 
+    // Constants
+    const allLists = [
+        {
+            text : 'Todo',
+            value : 'TODO'
+        },{
+            text : 'This Week',
+            value : 'THIS_WEEK'
+        },{
+            text : 'Today',
+            value : 'TODAY'
+        },{
+            text : 'Done',
+            value : 'DONE'
+        }
+    ];
+
+    // Store
     const auth = useAuthStore()
     const statusDialog = useStatusStore()
+
+    // States
+    const loading = ref(true);
     const plans = reactive({
         allPlans : [],
         idsPlans : [],
@@ -26,31 +47,24 @@
             deleted : false
         }
     })
-    const allLists = [
-        {
-            text : 'Todo',
-            value : 'TODO'
-        },{
-            text : 'This Week',
-            value : 'THIS_WEEK'
-        },{
-            text : 'Today',
-            value : 'TODAY'
-        },{
-            text : 'Done',
-            value : 'DONE'
+    const tags = reactive({
+        allTags : [],
+        tagModel : {
+            tagName: '',
+            color: ''
         }
-    ];
-    const tags = [
-        'asdasd',"burak"
-    ];
+    });
     const addPlanVisible = ref(false);
-    const addPlanRules = {
+    const addTagVisible = ref(false);
+    const addPlanValid = ref(false);    
+    const addTagValid = ref(false);
+
+    // Form Rules
+    const rules = {
         length : len => v => (v || '').length <= len || `Invalid character length, required ${len} at max`,
         required: v => !!v || 'This field is required',
+        count: len => v => v.length <= len || `You can select ${len} options at most`
     };
-    const addPlanValid = ref(false);
-    const loading = ref(true);
 
     // Functions to be used in KanbanList subcomponent
     const plansUtils = {
@@ -127,6 +141,16 @@
 
     }
 
+    const addTag = () => {
+        tags.allTags.push(tags.tagModel)
+        plans.planModel.tags.push(tags.tagModel.tagName)
+        tags.tagModel = {
+            tagName: '',
+            color: ''
+        }
+        addTagVisible.value = false
+    }
+
 </script>
 <template>
     <div class="mx-auto" style="width:75%;">
@@ -180,7 +204,7 @@
                     <div class="ma-4">
                         <v-text-field
                             v-model="plans.planModel.title"
-                            :rules="[addPlanRules.length(50),addPlanRules.required]"
+                            :rules="[rules.length(50),rules.required]"
                             color="cyan-darken-4"
                             label="Title"
                             counter="50"
@@ -192,7 +216,7 @@
                             clear-icon="mdi-close-circle"
                             auto-grow
                             counter="255"
-                            :rules="[addPlanRules.length(255),addPlanRules.required]"
+                            :rules="[rules.length(255),rules.required]"
                             color="cyan-darken-4"
                             label="Content"
                             rows="3"
@@ -207,60 +231,59 @@
                         <div class="d-flex ga-2">
                             <v-select
                                 v-model="plans.planModel.tags"
-                                :items="tags"
+                                :items="tags.allTags"
+                                item-value="tagName"
+                                item-title="tagName"
+                                :rules="[rules.count(3)]"
                                 label="Tags"
                                 multiple
                             >
-                                <template v-slot:selection="{item}">
-                                    <v-chip color="pink">
-                                        <span>{{ item.title }}</span>
+                                <template v-slot:selection="{index}">
+                                    <v-chip :color="tags.allTags[index].color">
+                                        <span>{{ tags.allTags[index].tagName }}</span>
                                     </v-chip>
                                 </template>
                             </v-select>
-                            <v-btn
-                                color="cyan-darken-4"
-                                variant="tonal"
-                                class="mt-3">
-                                Add
+                            <div class="mt-3">
+                                <v-btn
+                                    color="cyan-darken-4"
+                                    variant="tonal"                                    
+                                    @click="addTagVisible = !addTagVisible">
+                                    Add
+                                </v-btn>
                                 <v-overlay
-                                    activator="parent"
-                                    location-strategy="connected"
-                                    scroll-strategy="block"
+                                    v-model="addTagVisible"
+                                    class="justify-center align-center"
                                 >
-                                    <v-card class="pa-2">
-                                        <v-form>
-                                            <div class="d-flex ga-2">                                                
-                                                <div>
-                                                    <v-color-picker 
-                                                        :modes="['rgba']"
-                                                        hide-canvas 
-                                                        hide-inputs
-                                                        show-swatches>
-                                                    </v-color-picker>
-                                                </div>
-                                                <div class="d-flex flex-column justify-space-between align-end">
-                                                    <div>
-                                                        <v-text-field
-                                                            :rules="[addPlanRules.length(15),addPlanRules.required]"
-                                                            color="cyan-darken-4"
-                                                            style="width:250px;"
-                                                            label="Tag"
-                                                            counter="15"
-                                                        >
-                                                        </v-text-field>
-                                                    </div>
-                                                    <v-btn
-                                                        variant="tonal"
-                                                        color="cyan-darken-4"
-                                                        class="w-50"
-                                                    >OK
-                                                    </v-btn>
-                                                </div>
+                                    <v-card class="pa-4">
+                                        <v-form v-model="addTagValid">
+                                            <div class="d-flex flex-column ga-5">     
+                                                <v-color-picker
+                                                    v-model="tags.tagModel.color"
+                                                    :modes="['rgba']"
+                                                    hide-canvas 
+                                                    hide-inputs
+                                                    show-swatches>
+                                                </v-color-picker>
+                                                <v-text-field
+                                                    v-model="tags.tagModel.tagName"
+                                                    :rules="[rules.length(15),rules.required]"
+                                                    color="cyan-darken-4"
+                                                    label="Tag"
+                                                >
+                                                </v-text-field>
+                                                <v-btn
+                                                    :disabled="!addTagValid"
+                                                    variant="tonal"
+                                                    color="cyan-darken-4"
+                                                    @click="addTag()"
+                                                >OK
+                                                </v-btn>
                                             </div>
                                         </v-form>
                                     </v-card>
                                 </v-overlay>
-                            </v-btn>
+                            </div>
                         </div>
                     </div>            
                     <v-card-actions class="justify-end">
