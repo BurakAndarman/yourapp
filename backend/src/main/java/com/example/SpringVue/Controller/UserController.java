@@ -67,13 +67,4 @@ public class UserController {
 
     }
 
-    @PostMapping("/plans")
-    public ResponseEntity<String> savePlan(@RequestBody PlansDto plansDto, Authentication authentication) {
-
-        String saveMessage = userService.savePlan(plansDto, authentication.getName());
-
-        return new ResponseEntity<>(saveMessage, HttpStatus.CREATED);
-    }
-
-
 }

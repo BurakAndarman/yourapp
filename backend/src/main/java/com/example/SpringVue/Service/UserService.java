@@ -20,6 +20,4 @@ public interface UserService {
 
     List<PlansDto> getPlans(String userName);
 
-    String savePlan(PlansDto plansDto, String userName);
-
 }

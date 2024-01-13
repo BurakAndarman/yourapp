@@ -4,6 +4,8 @@ import com.example.SpringVue.Utils.KanbanList;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
+
 @Entity
 @Table(name = "plans")
 @Getter
@@ -21,11 +23,8 @@ public class Plans {
     @Column(name="title",nullable = false,length = 50)
     private String title;
 
-    @Column(name="content",nullable = false)
-    private String content;
-
-    @Column(name="tags")
-    private String tags = "";
+    @Column(name="content")
+    private String content = "";
 
     @Enumerated(EnumType.STRING)
     @Column(name="kanban_list",nullable = false)
@@ -36,13 +35,9 @@ public class Plans {
     @ToString.Exclude
     private User user;
 
-    public Plans(String title, String content, String tags, KanbanList kanbanList, User user) {
-        this.title = title;
-        this.content = content;
-        this.tags = tags;
-        this.kanbanList = kanbanList;
-        this.user = user;
-    }
+    @OneToMany(mappedBy = "plans", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private Set<PlansTags> plansTags;
 
 }
 

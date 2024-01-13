@@ -27,11 +27,11 @@
                             <div v-if="plan.tags.length" class="mt-5 w-100 d-flex flex-wrap ga-2">
                                 <v-chip
                                     v-for="(tag,index) in plan.tags"
-                                    color="primary"
+                                    :color="tag.color"
                                     label
                                     :key="index"
                                 >
-                                    {{ tag }}
+                                    {{ tag.name }}
                                 </v-chip>
                             </div>
                         </div>                        
@@ -75,7 +75,7 @@
                                             color="orange-darken-4"
                                             variant="text"
                                             icon="mdi-pencil"
-                                            @click.stop="props.plansUtils.changePlan(plan.id)"
+                                            @click.stop="props.plansUtils.openChangePlanForm(plan.id)"
                                             >
                                         </v-btn>
                                     </div>

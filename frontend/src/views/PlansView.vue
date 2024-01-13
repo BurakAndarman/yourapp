@@ -2,28 +2,14 @@
     import { onMounted, reactive, ref } from 'vue';
     import { useAuthStore } from '../store/auth';
     import { useStatusStore } from '../store/status';
+    import { usePlanFormStore } from '../store/planform';
     import KanbanList from '../components/KanbanList.vue';
-
-    // Constants
-    const allLists = [
-        {
-            text : 'Todo',
-            value : 'TODO'
-        },{
-            text : 'This Week',
-            value : 'THIS_WEEK'
-        },{
-            text : 'Today',
-            value : 'TODAY'
-        },{
-            text : 'Done',
-            value : 'DONE'
-        }
-    ];
+    import PlanForm from '../components/PlanForm.vue'
 
     // Store
     const auth = useAuthStore()
     const statusDialog = useStatusStore()
+    const planForm = usePlanFormStore();
 
     // States
     const loading = ref(true);
@@ -37,60 +23,25 @@
             done : []
         },
         expandedPlan : 0,
-        planModel : {
-            title : "",
-            content: "",
-            tags : [],
-            kanbanList : 'TODO',
-            created : false,
-            changed : false,
-            deleted : false
-        }
     })
-    const tags = reactive({
-        allTags : [],
-        tagModel : {
-            tagName: '',
-            color: ''
-        }
-    });
-    const addPlanVisible = ref(false);
-    const addTagVisible = ref(false);
-    const addPlanValid = ref(false);    
-    const addTagValid = ref(false);
 
-    // Form Rules
-    const rules = {
-        length : len => v => (v || '').length <= len || `Invalid character length, required ${len} at max`,
-        required: v => !!v || 'This field is required',
-        count: len => v => v.length <= len || `You can select ${len} options at most`
-    };
+    // Functions
+    const extractIdList = () => {
+        plans.idsPlans = plans.allPlans.map((plan) => plan.id);
+    }
 
-    // Functions to be used in KanbanList subcomponent
-    const plansUtils = {
-        changeList : (id, newList) => {
-            const index = plans.idsPlans.indexOf(id);
-            plans.allPlans[index].kanbanList = newList;
-            plans.allPlans[index].changed = true;
-            categorizePlans();
-        },
-        deletePlan : (id) => {
-            const index = plans.idsPlans.indexOf(id);
-            plans.allPlans[index].deleted = true;
-            categorizePlans();
-        },
-        changePlan : (id) => {
+    const categorizePlans = () => {
+        plans.categorizedPlans.todo = plans.allPlans.filter((plan) => (plan.kanbanList === "TODO" && !plan.deleted));
+        plans.categorizedPlans.this_week = plans.allPlans.filter((plan) => (plan.kanbanList === "THIS_WEEK" && !plan.deleted));
+        plans.categorizedPlans.today = plans.allPlans.filter((plan) => (plan.kanbanList === "TODAY" && !plan.deleted));
+        plans.categorizedPlans.done = plans.allPlans.filter((plan) => (plan.kanbanList === "DONE" && !plan.deleted));
+    }
 
-        },
-        expandPlan : (id) => {
-            plans.expandedPlan = id;
-        },
-        hidePlan : () => {
-            plans.expandedPlan = 0;
-        },
-        currentExpandedPlan : () => {
-            return plans.expandedPlan;
-        }
+    const openAddPlanForm = () => {
+        planForm.reset()
+        planForm.setPlanFormUtils(addPlanFormUtils)
+        planForm.setMode('add')
+        planForm.setVisibility(true)
     }
 
     onMounted(async () => {
@@ -126,29 +77,62 @@
         }
     })
 
-    const categorizePlans = () => {
-        plans.categorizedPlans.todo = plans.allPlans.filter((plan) => (plan.kanbanList === "TODO" && !plan.deleted));
-        plans.categorizedPlans.this_week = plans.allPlans.filter((plan) => (plan.kanbanList === "THIS_WEEK" && !plan.deleted));
-        plans.categorizedPlans.today = plans.allPlans.filter((plan) => (plan.kanbanList === "TODAY" && !plan.deleted));
-        plans.categorizedPlans.done = plans.allPlans.filter((plan) => (plan.kanbanList === "DONE" && !plan.deleted));
+    // Functions to be used in KanbanList subcomponent
+    const plansUtils = {
+        changeList : (id, newList) => {
+            const index = plans.idsPlans.indexOf(id);
+            plans.allPlans[index].kanbanList = newList;
+            plans.allPlans[index].changed = true;
+            categorizePlans();
+        },
+        deletePlan : (id) => {
+            const index = plans.idsPlans.indexOf(id);
+            plans.allPlans[index].deleted = true;
+            categorizePlans();
+        },
+        openChangePlanForm : (id) => {
+            plans.expandedPlan = 0
+            const index = plans.idsPlans.indexOf(id)
+            const plan = JSON.parse(JSON.stringify(plans.allPlans[index])) // For deep copying the object
+            const allTags = plan.tags.map((tag) => {
+                return {
+                    title : tag.name,
+                    value : tag
+                }
+            })
+
+            planForm.setAllTags(allTags)
+            planForm.setPlanModel(plan)
+            planForm.setPlanFormUtils(changePlanFormUtils)
+            planForm.setMode('change')
+            planForm.setVisibility(true)
+        },
+        expandPlan : (id) => {
+            plans.expandedPlan = id;
+        },
+        hidePlan : () => {
+            plans.expandedPlan = 0;
+        },
+        currentExpandedPlan : () => plans.expandedPlan,
     }
 
-    const extractIdList = () => {
-        plans.idsPlans = plans.allPlans.map((plan) => plan.id);
-    }
-
-    const addPlan = () => {
-
-    }
-
-    const addTag = () => {
-        tags.allTags.push(tags.tagModel)
-        plans.planModel.tags.push(tags.tagModel.tagName)
-        tags.tagModel = {
-            tagName: '',
-            color: ''
+    // Functions to be used in PlanForm for changing plan
+    const changePlanFormUtils = {
+        changeExistingPlan : (plan) => {
+            const index = plans.idsPlans.indexOf(plan.id)
+            plans.allPlans[index] = plan
+            categorizePlans()
         }
-        addTagVisible.value = false
+    }
+
+    // Functions to be used in PlanForm for adding plan
+    const addPlanFormUtils = {
+        generatePlanId : () => parseInt(plans.idsPlans.slice(-1)) + 1,
+        addNewPlan : (plan) => {
+            plans.allPlans.push(plan)
+            plans.idsPlans.push(plan.id)
+            categorizePlans()
+        }
     }
 
 </script>
@@ -165,7 +149,7 @@
                     variant="tonal"
                     icon="mdi-plus"
                     class="me-3"
-                    @click="addPlanVisible = true">
+                    @click="openAddPlanForm()">
                 </v-btn>
                 <v-btn
                     color="cyan-darken-4"
@@ -186,123 +170,6 @@
             <KanbanList title="Today" :plans="plans.categorizedPlans.today" :plansUtils="plansUtils"/>
             <KanbanList title="Done" :plans="plans.categorizedPlans.done" :plansUtils="plansUtils"/>
         </div>
-        <v-dialog
-            transition="dialog-bottom-transition"
-            v-model="addPlanVisible"
-            width="auto"
-        >
-            <v-card
-                width="400"
-            >
-                <v-form
-                    v-model="addPlanValid"
-                >
-                    <v-toolbar
-                        color="cyan-darken-4"
-                        title="Add Plan"
-                    ></v-toolbar>
-                    <div class="ma-4">
-                        <v-text-field
-                            v-model="plans.planModel.title"
-                            :rules="[rules.length(50),rules.required]"
-                            color="cyan-darken-4"
-                            label="Title"
-                            counter="50"
-                        >
-                        </v-text-field>
-                        <v-textarea
-                            v-model="plans.planModel.content"
-                            clearable
-                            clear-icon="mdi-close-circle"
-                            auto-grow
-                            counter="255"
-                            :rules="[rules.length(255),rules.required]"
-                            color="cyan-darken-4"
-                            label="Content"
-                            rows="3"
-                        ></v-textarea>
-                        <v-select
-                            v-model="plans.planModel.kanbanList"
-                            :items="allLists"
-                            item-value="value"
-                            item-title="text"
-                            label="List"
-                        ></v-select>
-                        <div class="d-flex ga-2">
-                            <v-select
-                                v-model="plans.planModel.tags"
-                                :items="tags.allTags"
-                                item-value="tagName"
-                                item-title="tagName"
-                                :rules="[rules.count(3)]"
-                                label="Tags"
-                                multiple
-                            >
-                                <template v-slot:selection="{index}">
-                                    <v-chip :color="tags.allTags[index].color">
-                                        <span>{{ tags.allTags[index].tagName }}</span>
-                                    </v-chip>
-                                </template>
-                            </v-select>
-                            <div class="mt-3">
-                                <v-btn
-                                    color="cyan-darken-4"
-                                    variant="tonal"                                    
-                                    @click="addTagVisible = !addTagVisible">
-                                    Add
-                                </v-btn>
-                                <v-overlay
-                                    v-model="addTagVisible"
-                                    class="justify-center align-center"
-                                >
-                                    <v-card class="pa-4">
-                                        <v-form v-model="addTagValid">
-                                            <div class="d-flex flex-column ga-5">     
-                                                <v-color-picker
-                                                    v-model="tags.tagModel.color"
-                                                    :modes="['rgba']"
-                                                    hide-canvas 
-                                                    hide-inputs
-                                                    show-swatches>
-                                                </v-color-picker>
-                                                <v-text-field
-                                                    v-model="tags.tagModel.tagName"
-                                                    :rules="[rules.length(15),rules.required]"
-                                                    color="cyan-darken-4"
-                                                    label="Tag"
-                                                >
-                                                </v-text-field>
-                                                <v-btn
-                                                    :disabled="!addTagValid"
-                                                    variant="tonal"
-                                                    color="cyan-darken-4"
-                                                    @click="addTag()"
-                                                >OK
-                                                </v-btn>
-                                            </div>
-                                        </v-form>
-                                    </v-card>
-                                </v-overlay>
-                            </div>
-                        </div>
-                    </div>            
-                    <v-card-actions class="justify-end">
-                        <v-btn
-                            variant="text"
-                            color="cyan-darken-4"
-                            @click="addPlanVisible = false"
-                        >Close
-                        </v-btn>
-                        <v-btn
-                            :disabled="!addPlanValid"
-                            variant="tonal"
-                            color="cyan-darken-4"
-                            @click="addPlan()"
-                        >Ok
-                        </v-btn>
-                    </v-card-actions>
-                </v-form>
-            </v-card>
-        </v-dialog>
     </div>  
+    <PlanForm></PlanForm>
 </template>

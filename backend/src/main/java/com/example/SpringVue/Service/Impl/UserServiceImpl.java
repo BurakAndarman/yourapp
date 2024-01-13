@@ -6,6 +6,7 @@ import com.example.SpringVue.Dto.NewsPreferencesDto;
 import com.example.SpringVue.Dto.PlansDto;
 import com.example.SpringVue.Entity.NewsPreferences;
 import com.example.SpringVue.Entity.Plans;
+import com.example.SpringVue.Entity.Tags;
 import com.example.SpringVue.Exception.DuplicateUsername;
 import com.example.SpringVue.Exception.NewsPreferenceNotFound;
 import com.example.SpringVue.Exception.UserNotFound;
@@ -44,7 +45,9 @@ public class UserServiceImpl implements UserService {
 
     private final EvictCache evictCache;
 
-    public UserServiceImpl(UserDetailsManager userDetailsManager, NewsService newsService, NewsPreferencesRepository newsPreferencesRepository, UserRepository userRepository, PlansRepository plansRepository, EvictCache evictCache){
+    public UserServiceImpl(UserDetailsManager userDetailsManager, NewsService newsService,
+                           NewsPreferencesRepository newsPreferencesRepository, UserRepository userRepository,
+                           PlansRepository plansRepository, EvictCache evictCache){
         this.userDetailsManager = userDetailsManager;
         this.newsService = newsService;
         this.newsPreferencesRepository = newsPreferencesRepository;
@@ -134,48 +137,19 @@ public class UserServiceImpl implements UserService {
         List<Plans> plans = plansRepository.findAllByUser(user.get());
 
         List<PlansDto> plansDtos = plans.stream().map(userPlan -> {
-            List<String> tags = new ArrayList<>();
 
-            if(!userPlan.getTags().isEmpty()) {
-                tags.addAll(Arrays.stream(userPlan.getTags().split(",")).toList());
-            }
+            List<Tags> tagsList = userPlan.getPlansTags().stream().map(plansTags -> plansTags.getTags()).toList();
 
             return new PlansDto(
                    userPlan.getId(),
                    userPlan.getTitle(),
                    userPlan.getContent(),
-                   tags,
-                   userPlan.getKanbanList()
+                   userPlan.getKanbanList(),
+                   tagsList
             );
         }).toList();
 
         return plansDtos;
-    }
-
-    @Override
-    public String savePlan(PlansDto plansDto, String userName) {
-
-        Optional<com.example.SpringVue.Entity.User> user = userRepository.findById(userName);
-
-        if(user.isEmpty()) {
-            throw new UserNotFound("Invalid username");
-        }
-
-        String tags = "";
-
-        if(!plansDto.getTags().isEmpty()) {
-            tags = String.join(",", plansDto.getTags());
-        }
-
-        plansRepository.save(new Plans(
-                plansDto.getTitle(),
-                plansDto.getContent(),
-                tags,
-                plansDto.getKanbanList(),
-                user.get()
-        ));
-
-        return "New plan recorded successfully";
     }
 
     @Cacheable(value = "userNewsCache", key = "#userName")
