@@ -1,6 +1,5 @@
 package com.example.SpringVue.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,14 +17,19 @@ public class PlansTags {
     @Column(name = "id", nullable = false)
     private int id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {CascadeType.PERSIST,CascadeType.DETACH})
     @JoinColumn(name = "plan_id", referencedColumnName = "id", nullable = false)
     @ToString.Exclude
     private Plans plans;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "tag_id", referencedColumnName = "name", nullable = false)
+    @ManyToOne(cascade = {CascadeType.PERSIST,CascadeType.DETACH})
+    @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false)
     @ToString.Exclude
     private Tags tags;
+
+    public PlansTags(Plans plans, Tags tags) {
+        this.plans = plans;
+        this.tags = tags;
+    }
 
 }

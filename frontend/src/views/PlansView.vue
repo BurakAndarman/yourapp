@@ -44,7 +44,48 @@
         planForm.setVisibility(true)
     }
 
+    const savePlans = async () => {
+
+        try{
+            const response = await fetch('http://localhost:8090/api/v1/user/plans',{
+                method : "POST",
+                headers : {
+                    "Content-Type" : "application/json",
+                    "Authorization" : `Bearer ${auth.token}`
+                },
+                body: JSON.stringify(plans.allPlans)
+            });
+
+            if(response.status == 401) {
+                auth.logout();
+            }            
+
+            if(response.status == 200) {
+                const successResponse = await response.text()
+
+                statusDialog.openStatusDialog(successResponse,'success')
+
+                await fetchPlans()
+            } else {
+                const errorResponse = await response.json();
+
+                throw new Error(errorResponse.message)
+            }
+        }catch(e) {
+
+            statusDialog.openStatusDialog(e,'error')
+
+        }
+
+    }
+
     onMounted(async () => {
+
+        await fetchPlans()
+
+    })
+
+    const fetchPlans = async () => {
 
         try{
             const response = await fetch('http://localhost:8090/api/v1/user/plans',{
@@ -65,7 +106,10 @@
 
                 extractIdList()
                 categorizePlans()
-                loading.value = false
+
+                if(loading.value) {
+                    loading.value = false
+                }                
             
             } else {
                 throw new Error(parsedResponse.message)
@@ -75,7 +119,8 @@
             statusDialog.openStatusDialog(e,'error')
 
         }
-    })
+
+    }
 
     // Functions to be used in KanbanList subcomponent
     const plansUtils = {
@@ -154,7 +199,8 @@
                 <v-btn
                     color="cyan-darken-4"
                     variant="tonal"
-                    icon="mdi-content-save">
+                    icon="mdi-content-save"
+                    @click="savePlans()">
                 </v-btn>
             </div>
         </div>
@@ -170,6 +216,6 @@
             <KanbanList title="Today" :plans="plans.categorizedPlans.today" :plansUtils="plansUtils"/>
             <KanbanList title="Done" :plans="plans.categorizedPlans.done" :plansUtils="plansUtils"/>
         </div>
-    </div>  
-    <PlanForm></PlanForm>
+    </div>
+    <PlanForm/>
 </template>

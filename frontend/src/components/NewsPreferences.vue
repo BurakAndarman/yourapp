@@ -82,7 +82,7 @@
 
                 statusDialog.openStatusDialog(successResponse,'success')
 
-                props.fetchNewArticles();
+                await props.fetchNewArticles();
             
             } else {
                 const errorResponse = await response.json()

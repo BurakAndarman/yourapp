@@ -25,7 +25,8 @@
     // Models
     let tagModel = reactive({
         name: '',
-        color: ''
+        color: '',
+        created : true
     })
 
     // Extra
@@ -51,8 +52,6 @@
         planForm.planModel.created = true
 
         planForm.planFormUtils.addNewPlan(planForm.planModel)
-
-        planForm.reset()
     }
 
     const changePlan = () => {
@@ -61,8 +60,6 @@
         planForm.planModel.changed = true
 
         planForm.planFormUtils.changeExistingPlan(planForm.planModel)
-
-        planForm.reset()
     }
 
     const addTag = () => {
@@ -75,7 +72,8 @@
         planForm.planModel.tags.push(tagModel)
         tagModel = {
             name: '',
-            color: ''
+            color: '',
+            created : true
         }
     }
 
@@ -146,38 +144,6 @@
                                 @click="isAddTagVisible = true">
                                 Add
                             </v-btn>
-                            <v-overlay
-                                v-model="isAddTagVisible"
-                                class="justify-center align-center"
-                            >
-                                <v-card class="pa-4">
-                                    <v-form v-model="validations.addTag">
-                                        <div class="d-flex flex-column ga-5">     
-                                            <v-color-picker
-                                                v-model="tagModel.color"
-                                                :modes="['rgba']"
-                                                hide-canvas 
-                                                hide-inputs
-                                                show-swatches>
-                                            </v-color-picker>
-                                            <v-text-field
-                                                v-model="tagModel.name"
-                                                :rules="[rules.length(15),rules.required]"
-                                                color="cyan-darken-4"
-                                                label="Tag"
-                                            >
-                                            </v-text-field>
-                                            <v-btn
-                                                :disabled="!validations.addTag"
-                                                variant="tonal"
-                                                color="cyan-darken-4"
-                                                @click="addTag()"
-                                            >OK
-                                            </v-btn>
-                                        </div>
-                                    </v-form>
-                                </v-card>
-                            </v-overlay>
                         </div>
                     </div>
                 </div>            
@@ -199,4 +165,36 @@
             </v-form>
         </v-card>
     </v-dialog>
+    <v-overlay
+        v-model="isAddTagVisible"
+        class="justify-center align-center"
+    >
+        <v-card class="pa-4">
+            <v-form v-model="validations.addTag">
+                <div class="d-flex flex-column ga-5">     
+                    <v-color-picker
+                        v-model="tagModel.color"
+                        :modes="['rgba']"
+                        hide-canvas 
+                        hide-inputs
+                        show-swatches>
+                    </v-color-picker>
+                    <v-text-field
+                        v-model="tagModel.name"
+                        :rules="[rules.length(15),rules.required]"
+                        color="cyan-darken-4"
+                        label="Tag"
+                    >
+                    </v-text-field>
+                    <v-btn
+                        :disabled="!validations.addTag"
+                        variant="tonal"
+                        color="cyan-darken-4"
+                        @click="addTag()"
+                    >OK
+                    </v-btn>
+                </div>
+            </v-form>
+        </v-card>
+    </v-overlay>
 </template>

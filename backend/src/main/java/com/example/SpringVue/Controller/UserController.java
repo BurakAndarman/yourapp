@@ -52,9 +52,9 @@ public class UserController {
     @PutMapping("/news-preferences")
     public ResponseEntity<String> updateNewsPreferences(@RequestBody NewsPreferencesDto newsPreferencesDto, Authentication authentication) {
 
-        String saveMessage = userService.updateNewsPreferences(newsPreferencesDto, authentication.getName());
+        String updateMessage = userService.updateNewsPreferences(newsPreferencesDto, authentication.getName());
 
-        return new ResponseEntity<>(saveMessage, HttpStatus.OK);
+        return new ResponseEntity<>(updateMessage, HttpStatus.OK);
 
     }
 
@@ -64,6 +64,15 @@ public class UserController {
         List<PlansDto> plansDtoList = userService.getPlans(authentication.getName());
 
         return new ResponseEntity<>(plansDtoList, HttpStatus.OK);
+
+    }
+
+    @PostMapping("/plans")
+    public ResponseEntity<String> savePlans(@RequestBody List<PlansDto> plansDtoList, Authentication authentication) {
+
+        String saveMessage = userService.savePlans(plansDtoList, authentication.getName());
+
+        return new ResponseEntity<>(saveMessage, HttpStatus.OK);
 
     }
 

@@ -1,15 +1,12 @@
 package com.example.SpringVue.Dto;
 
-import com.example.SpringVue.Entity.Tags;
 import com.example.SpringVue.Utils.KanbanList;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @ToString
 @Getter
 @Setter
@@ -21,9 +18,9 @@ public class PlansDto {
 
     private String content;
 
-    private KanbanList kanbanList;
+    private String kanbanList;
 
-    private List<Tags> tags;
+    private List<TagsDto> tags;
 
     // Fields to be used in client for indicating certain actions
 
@@ -33,7 +30,7 @@ public class PlansDto {
 
     private boolean deleted = false;
 
-    public PlansDto(int id,String title, String content, KanbanList kanbanList, List<Tags> tags) {
+    public PlansDto(int id,String title, String content, String kanbanList, List<TagsDto> tags) {
         this.id = id;
         this.title = title;
         this.content = content;

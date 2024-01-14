@@ -30,7 +30,7 @@ public class Plans {
     @Column(name="kanban_list",nullable = false)
     private KanbanList kanbanList = KanbanList.TODO;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = {CascadeType.MERGE,CascadeType.PERSIST})
     @JoinColumn(name = "username", nullable = false)
     @ToString.Exclude
     private User user;
@@ -38,6 +38,21 @@ public class Plans {
     @OneToMany(mappedBy = "plans", cascade = CascadeType.ALL)
     @ToString.Exclude
     private Set<PlansTags> plansTags;
+
+    public Plans(int id, String title, String content, KanbanList kanbanList, User user) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.kanbanList = kanbanList;
+        this.user = user;
+    }
+
+    public Plans(String title, String content, KanbanList kanbanList, User user) {
+        this.title = title;
+        this.content = content;
+        this.kanbanList = kanbanList;
+        this.user = user;
+    }
 
 }
 
