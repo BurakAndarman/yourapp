@@ -4,6 +4,7 @@ import com.example.SpringVue.Utils.KanbanList;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -30,22 +31,14 @@ public class Plans {
     @Column(name="kanban_list",nullable = false)
     private KanbanList kanbanList = KanbanList.TODO;
 
-    @ManyToOne(cascade = {CascadeType.MERGE,CascadeType.PERSIST})
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "username", nullable = false)
     @ToString.Exclude
     private User user;
 
-    @OneToMany(mappedBy = "plans", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "plans", cascade = CascadeType.PERSIST, orphanRemoval = true)
     @ToString.Exclude
-    private Set<PlansTags> plansTags;
-
-    public Plans(int id, String title, String content, KanbanList kanbanList, User user) {
-        this.id = id;
-        this.title = title;
-        this.content = content;
-        this.kanbanList = kanbanList;
-        this.user = user;
-    }
+    private Set<PlansTags> plansTags = new HashSet<>();
 
     public Plans(String title, String content, KanbanList kanbanList, User user) {
         this.title = title;

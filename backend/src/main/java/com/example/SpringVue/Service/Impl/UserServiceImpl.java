@@ -29,7 +29,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
 
-import java.sql.SQLOutput;
 import java.util.*;
 
 @Service
@@ -184,55 +183,62 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFound("Invalid username");
         }
 
-        for (PlansDto plansDto : plansDtoList) {
-
+        plansDtoList.stream().forEach(plansDto -> {
             if(plansDto.isCreated() && !plansDto.isDeleted()) {
 
-                 Plans newPlan = plansRepository.save(new Plans(
-                    plansDto.getTitle(),
-                    plansDto.getContent(),
-                    KanbanList.valueOf(plansDto.getKanbanList()),
-                    user.get()
-                 ));
+                Plans newPlan = plansRepository.save(new Plans(
+                        plansDto.getTitle(),
+                        plansDto.getContent(),
+                        KanbanList.valueOf(plansDto.getKanbanList()),
+                        user.get()
+                ));
 
-                for (TagsDto tagsDto : plansDto.getTags()) {
-
-                    userUtils.createPlanTagRelation(newPlan, tagsDto);
-
-                }
+                plansDto.getTags().stream().forEach(tagsDto -> userUtils.createNewPlansTagsRelation(newPlan, tagsDto));
 
             } else if (plansDto.isChanged() && !plansDto.isDeleted()) {
 
-                Plans updatedPlan = plansRepository.save(new Plans(
-                   plansDto.getId(),
-                   plansDto.getTitle(),
-                   plansDto.getContent(),
-                   KanbanList.valueOf(plansDto.getKanbanList()),
-                   user.get()
-                ));
+                Set<PlansTags> existingPlansTagsRelations = new HashSet<>();
 
-                userUtils.removePlanTagRelation(plansDto, updatedPlan);
+                if(!plansDto.getTags().isEmpty()) {
 
-                for (TagsDto tagsDto : plansDto.getTags()) {
+                    Plans oldPlan = plansRepository.findById(plansDto.getId()).get();
 
-                    if (tagsDto.isCreated()) {
-                        userUtils.createPlanTagRelation(updatedPlan, tagsDto);
-                    }
+                    Collection<Tags> existingOldTags = new ArrayList<>();
+
+                    plansDto.getTags().stream().forEach(tagsDto -> {
+                        if(!tagsDto.isCreated()) {
+                            existingOldTags.add(tagsRepository.findById(tagsDto.getId()).get());
+                        }
+                    });
+
+                    existingPlansTagsRelations = plansTagsRepository.getPlansTagsByTagsInAndPlans(existingOldTags,oldPlan);
 
                 }
+
+                Plans updatedPlan = plansRepository.save(new Plans(
+                        plansDto.getId(),
+                        plansDto.getTitle(),
+                        plansDto.getContent(),
+                        KanbanList.valueOf(plansDto.getKanbanList()),
+                        user.get(),
+                        existingPlansTagsRelations
+                ));
+
+                plansDto.getTags().stream().forEach(tagsDto -> {
+                    if(tagsDto.isCreated()) {
+                        userUtils.createNewPlansTagsRelation(updatedPlan, tagsDto);
+                    }
+                });
 
 
             } else if (plansDto.isDeleted() && !plansDto.isCreated()) {
 
-                Optional<Plans> planToBeDeleted = plansRepository.findById(plansDto.getId());
+                Plans planToBeDeleted = plansRepository.findById(plansDto.getId()).get();
 
-                plansTagsRepository.deletePlansTagsByPlans(planToBeDeleted.get());
-
-                plansRepository.deleteById(planToBeDeleted.get().getId());
+                plansRepository.delete(planToBeDeleted);
 
             }
-
-        }
+        });
 
         return "Changes recorded successfully";
     }

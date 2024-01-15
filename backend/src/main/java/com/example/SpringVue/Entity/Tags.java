@@ -25,7 +25,7 @@ public class Tags {
     @Column(name = "color", length = 10, nullable = false)
     private String color;
 
-    @OneToMany(mappedBy = "tags",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "tags",cascade = CascadeType.PERSIST)
     @ToString.Exclude
     private Set<PlansTags> plansTags;
 

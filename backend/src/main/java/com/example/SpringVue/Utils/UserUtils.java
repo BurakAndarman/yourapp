@@ -27,22 +27,8 @@ public class UserUtils {
         this.plansTagsRepository = plansTagsRepository;
     }
 
-    public void removePlanTagRelation(PlansDto plansDto, Plans plan) {
-        Collection<Tags> existingOldTags = new ArrayList<>();
-
-        for (TagsDto tagsDto : plansDto.getTags()) {
-
-            if(!tagsDto.isCreated()) {
-                existingOldTags.add(tagsRepository.findById(tagsDto.getId()).get());
-            }
-
-        }
-
-        plansTagsRepository.deletePlansTagsByTagsNotInAndPlans(existingOldTags,plan);
-    }
-
-    // Checks if newly created tag exists in db. If exists, gets it and if not creates new one. Then adds a relation record.
-    public void createPlanTagRelation(Plans plan, TagsDto tagsDto) {
+    // Checks if passed tag exists in db. If exists, gets it and if not creates new one. Then adds a relation record.
+    public void createNewPlansTagsRelation(Plans plan, TagsDto tagsDto) {
 
         Optional<Tags> tag = tagsRepository.findFirstByNameAndColor(tagsDto.getName(), tagsDto.getColor());
 

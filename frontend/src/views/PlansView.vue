@@ -172,7 +172,7 @@
 
     // Functions to be used in PlanForm for adding plan
     const addPlanFormUtils = {
-        generatePlanId : () => parseInt(plans.idsPlans.slice(-1)) + 1,
+        generatePlanId : () => plans.idsPlans.length ? parseInt(plans.idsPlans.slice(-1)) + 1 : 1,
         addNewPlan : (plan) => {
             plans.allPlans.push(plan)
             plans.idsPlans.push(plan.id)
