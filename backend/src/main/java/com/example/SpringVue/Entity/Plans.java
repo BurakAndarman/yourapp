@@ -31,7 +31,7 @@ public class Plans {
     @Column(name="kanban_list",nullable = false)
     private KanbanList kanbanList = KanbanList.TODO;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "username", nullable = false)
     @ToString.Exclude
     private User user;

@@ -24,12 +24,12 @@ public class User {
     @Column(name="enabled")
     private boolean enabled;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     @ToString.Exclude
     private NewsPreferences newsPreferences;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user")
     @ToString.Exclude
     private Set<Plans> plans;
 

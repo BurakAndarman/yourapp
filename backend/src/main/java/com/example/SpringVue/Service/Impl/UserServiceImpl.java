@@ -122,7 +122,7 @@ public class UserServiceImpl implements UserService {
         String interestedTopics = "";
 
         if(!newsPreferencesDto.getInterestedTopics().isEmpty()) {
-            interestedTopics = String.join(",", newsPreferencesDto.getInterestedTopics());
+            interestedTopics += String.join(",", newsPreferencesDto.getInterestedTopics());
         }
 
         NewsPreferences newsPreferences = new NewsPreferences(
@@ -155,9 +155,16 @@ public class UserServiceImpl implements UserService {
             List<TagsDto> tagsDtoList = new ArrayList<>();
 
             if(userPlan.getPlansTags() != null) {
-                List<Tags> tagsList = userPlan.getPlansTags().stream().map(plansTags -> plansTags.getTags()).toList();
+                tagsDtoList.addAll(userPlan.getPlansTags().stream().map(plansTags -> {
 
-                tagsDtoList = tagsList.stream().map(tags -> new TagsDto(tags.getId(), tags.getName(), tags.getColor())).toList();
+                    Tags tag = plansTags.getTags();
+
+                    return new TagsDto(
+                        tag.getId(),
+                        tag.getName(),
+                        tag.getColor()
+                    );
+                }).toList());
             }
 
 
@@ -270,15 +277,13 @@ public class UserServiceImpl implements UserService {
             return articlesMap;
         }
 
-        String[] preferredTopics = validatedNewsPreferences.getInterestedTopics().split(","); // Splitting comma separated topics
+        List<String> preferredTopics = Arrays.stream(validatedNewsPreferences.getInterestedTopics().split(",")).toList(); // Splitting comma separated topics
 
-        for(String preferredTopic : preferredTopics) {
-
+        preferredTopics.stream().forEach(preferredTopic -> {
             TopHeadlines topHeadlines = newsService.getTopHeadlines(preferredTopic,preferredLanguage);
 
             articlesMap.put(preferredTopic,topHeadlines.getArticles().stream().limit(6).toList());
-
-        }
+        });
 
         return articlesMap;
     }

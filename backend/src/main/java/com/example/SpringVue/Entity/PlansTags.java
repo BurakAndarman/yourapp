@@ -17,12 +17,12 @@ public class PlansTags {
     @Column(name = "id", nullable = false)
     private int id;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "plan_id", referencedColumnName = "id", nullable = false)
     @ToString.Exclude
     private Plans plans;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "tag_id", referencedColumnName = "id", nullable = false)
     @ToString.Exclude
     private Tags tags;
