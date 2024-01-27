@@ -2,14 +2,12 @@
     import { onMounted, reactive, ref } from 'vue';
     import { useAuthStore } from '../store/auth';
     import { useStatusStore } from '../store/status';
-    import { usePlanFormStore } from '../store/planform';
     import KanbanList from '../components/KanbanList.vue';
     import PlanForm from '../components/PlanForm.vue'
 
     // Store
     const auth = useAuthStore()
     const statusDialog = useStatusStore()
-    const planForm = usePlanFormStore();
 
     // States
     const loading = ref(true);
@@ -23,6 +21,22 @@
             done : []
         },
         expandedPlan : 0,
+    })
+    const planForm = reactive({
+        planModel : {
+            id : 0,
+            title : "",
+            content: "",
+            tags : [],
+            kanbanList : 'TODO',
+            created : false,
+            changed : false,
+            deleted : false
+        },
+        allTags : [],
+        utils : {},
+        isVisible : false,
+        mode : '',
     })
 
     // Functions
@@ -38,10 +52,20 @@
     }
 
     const openAddPlanForm = () => {
-        planForm.reset()
-        planForm.setPlanFormUtils(addPlanFormUtils)
-        planForm.setMode('add')
-        planForm.setVisibility(true)
+        planForm.planModel = {
+            id : 0,
+            title : "",
+            content: "",
+            tags : [],
+            kanbanList : 'TODO',
+            created : false,
+            changed : false,
+            deleted : false
+        }
+        planForm.allTags = []
+        planForm.utils = addPlanFormUtils
+        planForm.mode = 'add'
+        planForm.isVisible = true
     }
 
     const savePlans = async () => {
@@ -146,11 +170,11 @@
                 }
             })
 
-            planForm.setAllTags(allTags)
-            planForm.setPlanModel(plan)
-            planForm.setPlanFormUtils(changePlanFormUtils)
-            planForm.setMode('change')
-            planForm.setVisibility(true)
+            planForm.planModel = plan;
+            planForm.allTags = allTags;            
+            planForm.utils = changePlanFormUtils;
+            planForm.mode = 'change';
+            planForm.isVisible = true;
         },
         expandPlan : (id) => {
             plans.expandedPlan = id;
@@ -161,16 +185,16 @@
         currentExpandedPlan : () => plans.expandedPlan,
     }
 
-    // Functions to be used in PlanForm for changing plan
+    // Functions to be used in PlanForm subcomponent for changing plan
     const changePlanFormUtils = {
         changeExistingPlan : (plan) => {
             const index = plans.idsPlans.indexOf(plan.id)
-            plans.allPlans[index] = plan
+            plans.allPlans[index] = plan            
             categorizePlans()
         }
     }
 
-    // Functions to be used in PlanForm for adding plan
+    // Functions to be used in PlanForm subcomponent for adding plan
     const addPlanFormUtils = {
         generatePlanId : () => plans.idsPlans.length ? parseInt(plans.idsPlans.slice(-1)) + 1 : 1,
         addNewPlan : (plan) => {
@@ -178,6 +202,11 @@
             plans.idsPlans.push(plan.id)
             categorizePlans()
         }
+    }
+
+    // Other functions to be used in PlanForm subcomponent
+    const closePlanForm = () => {
+        planForm.isVisible = false;
     }
 
 </script>
@@ -217,5 +246,11 @@
             <KanbanList title="Done" :plans="plans.categorizedPlans.done" :plansUtils="plansUtils"/>
         </div>
     </div>
-    <PlanForm/>
+    <PlanForm :planModelProp="planForm.planModel"
+              :allTagsProp="planForm.allTags"
+              :utils="planForm.utils"
+              :mode="planForm.mode"
+              :isVisibleProp="planForm.isVisible"
+              :closePlanForm="closePlanForm"
+    />
 </template>

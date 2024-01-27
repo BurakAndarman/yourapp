@@ -1,9 +1,5 @@
 <script setup>
-    import { ref, reactive } from 'vue';
-    import { usePlanFormStore } from '../store/planform';
-
-    // Store
-    const planForm = usePlanFormStore();
+    import { ref, reactive, watch } from 'vue';
 
     // Constants
     const kanbanLists = [
@@ -22,19 +18,42 @@
         }
     ];
 
+    // Props
+    const props = defineProps({
+        planModelProp: Object,
+        allTagsProp: Object,
+        utils: Object,
+        mode: String,
+        isVisibleProp: Boolean,
+        closePlanForm: Function
+    });
+
     // Models
-    let tagModel = reactive({
+    const planModel = ref({})
+    const tagModel = ref({
         name: '',
         color: '',
         created : true
     })
 
     // Extra
+    const isVisible = ref(false)
     const isAddTagVisible = ref(false)
-
+    const allTags = ref([])    
     const validations = reactive({
         plan : false,
         addTag : false
+    })
+
+    // Watchers
+    watch(() => props.planModelProp, (planModelProp) => {
+        planModel.value = planModelProp
+    })
+    watch(() => props.allTagsProp, (allTagsProp) => {
+        allTags.value = allTagsProp
+    })
+    watch(() => props.isVisibleProp, (isVisibleProp) => {
+        isVisible.value = isVisibleProp
     })
 
     // Form Rules
@@ -46,31 +65,31 @@
 
     // Functions
     const addPlan = () => {
-        planForm.setVisibility(false)
+        props.closePlanForm()
 
-        planForm.planModel.id = planForm.planFormUtils.generatePlanId()
-        planForm.planModel.created = true
+        planModel.value.id = props.utils.generatePlanId()
+        planModel.value.created = true
 
-        planForm.planFormUtils.addNewPlan(planForm.planModel)
+        props.utils.addNewPlan(planModel.value)
     }
 
-    const changePlan = () => {
-        planForm.setVisibility(false)
-        
-        planForm.planModel.changed = true
+    const changePlan = () => {        
+        props.closePlanForm()
 
-        planForm.planFormUtils.changeExistingPlan(planForm.planModel)
+        planModel.value.changed = true
+
+        props.utils.changeExistingPlan(planModel.value)
     }
 
     const addTag = () => {
         isAddTagVisible.value = false
 
-        planForm.allTags.push({
-            title : tagModel.name,
-            value : tagModel
+        allTags.value.push({
+            title : tagModel.value.name,
+            value : tagModel.value
         })
-        planForm.planModel.tags.push(tagModel)
-        tagModel = {
+        planModel.value.tags.push(tagModel.value)
+        tagModel.value = {
             name: '',
             color: '',
             created : true
@@ -81,7 +100,8 @@
 <template>
     <v-dialog
         transition="dialog-bottom-transition"
-        v-model="planForm.isVisible"
+        v-model="isVisible"
+        @click:outside="props.closePlanForm()"
         width="auto"
     >
         <v-card
@@ -92,11 +112,11 @@
             >
                 <v-toolbar
                     color="cyan-darken-4"
-                    :title="planForm.mode === 'add' ? 'Add Plan' : 'Change Plan'"
+                    :title="props.mode === 'add' ? 'Add Plan' : 'Change Plan'"
                 ></v-toolbar>
                 <div class="ma-4">
                     <v-text-field
-                        v-model="planForm.planModel.title"
+                        v-model="planModel.title"
                         :rules="[rules.length(50),rules.required]"
                         color="cyan-darken-4"
                         label="Title"
@@ -104,7 +124,7 @@
                     >
                     </v-text-field>
                     <v-textarea
-                        v-model="planForm.planModel.content"
+                        v-model="planModel.content"
                         clearable
                         clear-icon="mdi-close-circle"
                         auto-grow
@@ -115,7 +135,7 @@
                         rows="3"
                     ></v-textarea>
                     <v-select
-                        v-model="planForm.planModel.kanbanList"
+                        v-model="planModel.kanbanList"
                         :items="kanbanLists"
                         item-value="value"
                         item-title="title"
@@ -123,8 +143,8 @@
                     ></v-select>
                     <div class="d-flex ga-2">
                         <v-select
-                            v-model="planForm.planModel.tags"
-                            :items="planForm.allTags"
+                            v-model="planModel.tags"
+                            :items="allTags"
                             item-value="value"
                             item-title="title"
                             :rules="[rules.count(3)]"
@@ -151,14 +171,14 @@
                     <v-btn
                         variant="text"
                         color="cyan-darken-4"
-                        @click="planForm.setVisibility(false)"
+                        @click="props.closePlanForm()"
                     >Close
                     </v-btn>
                     <v-btn
                         :disabled="!validations.plan"
                         variant="tonal"
                         color="cyan-darken-4"
-                        @click="planForm.mode === 'add' ? addPlan() : changePlan()"
+                        @click="props.mode === 'add' ? addPlan() : changePlan()"
                     >Ok
                     </v-btn>
                 </v-card-actions>
