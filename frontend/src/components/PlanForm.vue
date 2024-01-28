@@ -37,9 +37,9 @@
     })
 
     // Extra
+    const allTags = ref([])
     const isVisible = ref(false)
-    const isAddTagVisible = ref(false)
-    const allTags = ref([])    
+    const isAddTagVisible = ref(false)        
     const validations = reactive({
         plan : false,
         addTag : false
@@ -86,7 +86,7 @@
 
         let tagFound = false
 
-        allTags.value.forEach((tagObject) => {
+        for (const tagObject of allTags.value) {
 
             if(tagObject.value.name === tagModel.value.name && tagObject.value.color === tagModel.value.color) {
 
@@ -97,9 +97,9 @@
                 }
 
                 tagFound = true
+                break;
             }
-
-        })
+        }
 
         if(!tagFound) {
 
@@ -112,6 +112,24 @@
 
             planModel.value.tags.push(tagModel.value)
             sortTags('planModelTags')
+
+            // We don't sort these here because we want to keep them chronogically in local storage
+            let lastAddedTags = localStorage.getItem('lastAddedTags')
+
+            if(lastAddedTags) {
+                lastAddedTags = JSON.parse(lastAddedTags)
+
+                if(lastAddedTags.length === 5) {
+                    lastAddedTags.pop()
+                }
+
+                lastAddedTags.unshift(tagModel.value)
+                localStorage.setItem('lastAddedTags', JSON.stringify(lastAddedTags))
+
+            } else {
+                localStorage.setItem('lastAddedTags',JSON.stringify([tagModel.value]))
+
+            }
 
         }
 

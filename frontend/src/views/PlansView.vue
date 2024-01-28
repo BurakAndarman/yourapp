@@ -59,6 +59,18 @@
         categorizePlans()
     }
 
+    const sortAllTags = () => {
+        planForm.allTags.sort((a, b) => {
+            if (a.title < b.title) {
+                return -1;
+            }
+            if (a.title > b.title) {
+                return 1;
+            }
+            return 0;
+        })
+    }
+
     const categorizePlans = () => {
         plans.categorizedPlans.todo = plans.allPlans.filter((plan) => (plan.kanbanList === "TODO" && !plan.deleted));
         plans.categorizedPlans.this_week = plans.allPlans.filter((plan) => (plan.kanbanList === "THIS_WEEK" && !plan.deleted));
@@ -77,7 +89,26 @@
             changed : false,
             deleted : false
         }
-        planForm.allTags = []
+
+        let lastAddedTags = localStorage.getItem('lastAddedTags')
+
+        if(lastAddedTags) {
+            lastAddedTags = JSON.parse(lastAddedTags)
+
+            planForm.allTags = lastAddedTags.map((tag) => {
+                return {
+                    title : tag.name,
+                    value : tag
+                }
+            })
+
+            sortAllTags()
+
+        } else {
+            planForm.allTags = []
+
+        }
+        
         planForm.utils = addPlanFormUtils
         planForm.mode = 'add'
         planForm.isVisible = true
@@ -177,15 +208,52 @@
             plans.expandedPlan = 0
             const index = plans.idsPlans.indexOf(id)
             const plan = JSON.parse(JSON.stringify(plans.allPlans[index])) // For deep copying the object
-            const allTags = plan.tags.map((tag) => {
+            const allTags = []
+
+            let lastAddedTags = localStorage.getItem('lastAddedTags')
+
+            if(lastAddedTags) {
+                lastAddedTags = JSON.parse(lastAddedTags)
+                lastAddedTags = lastAddedTags.filter((tag) => {
+
+                    let notFoundInPlanTags = true;
+
+                    for (const planTag of plan.tags) {
+                        if(planTag.name === tag.name && planTag.color === tag.color) {
+                            notFoundInPlanTags = false;
+                            break;
+                        }
+                    }
+
+                    return notFoundInPlanTags;
+                })
+
+                lastAddedTags = lastAddedTags.map((tag) => {
+                    return {
+                        title : tag.name,
+                        value : tag
+                    }
+                })
+
+                allTags.push(...lastAddedTags)
+            }
+
+            const planTags = plan.tags.map((tag) => {
                 return {
                     title : tag.name,
                     value : tag
                 }
             })
 
+            allTags.push(...planTags)
+
             planForm.planModel = plan;
-            planForm.allTags = allTags;            
+
+            planForm.allTags = allTags;
+            if(lastAddedTags) {
+                sortAllTags()
+            }
+
             planForm.utils = changePlanFormUtils;
             planForm.mode = 'change';
             planForm.isVisible = true;
