@@ -84,11 +84,37 @@
     const addTag = () => {
         isAddTagVisible.value = false
 
-        allTags.value.push({
-            title : tagModel.value.name,
-            value : tagModel.value
+        let tagFound = false
+
+        allTags.value.forEach((tagObject) => {
+
+            if(tagObject.value.name === tagModel.value.name && tagObject.value.color === tagModel.value.color) {
+
+                if(!planModel.value.tags.includes(tagObject.value)) {
+                    planModel.value.tags.push(tagObject.value)
+                    sortTags('planModelTags')
+
+                }
+
+                tagFound = true
+            }
+
         })
-        planModel.value.tags.push(tagModel.value)
+
+        if(!tagFound) {
+
+            allTags.value.push({
+                title : tagModel.value.name,
+                value : tagModel.value
+            })
+            sortTags('allTags')
+
+
+            planModel.value.tags.push(tagModel.value)
+            sortTags('planModelTags')
+
+        }
+
         tagModel.value = {
             name: '',
             color: '',
@@ -96,6 +122,35 @@
         }
     }
 
+    const sortTags = (tagsArrayName) => {
+
+        if(tagsArrayName === 'allTags') {
+
+            allTags.value.sort((a, b) => {
+                if (a.title < b.title) {
+                    return -1;
+                }
+                if (a.title > b.title) {
+                    return 1;
+                }
+                return 0;
+            });
+        
+        } else {
+
+            planModel.value.tags.sort((a, b) => {
+                if (a.name < b.name) {
+                    return -1;
+                }
+                if (a.name > b.name) {
+                    return 1;
+                }
+                return 0;
+            });
+
+        }
+        
+    }
 </script>
 <template>
     <v-dialog
@@ -149,6 +204,7 @@
                             item-title="title"
                             :rules="[rules.count(3)]"
                             label="Tags"
+                            @update:modelValue="sortTags('planModelTags')"
                             multiple
                         >
                             <template v-slot:selection="{item}">

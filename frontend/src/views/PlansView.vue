@@ -40,8 +40,23 @@
     })
 
     // Functions
-    const extractIdList = () => {
-        plans.idsPlans = plans.allPlans.map((plan) => plan.id);
+    const afterFetchPlans = () => {
+        plans.idsPlans = plans.allPlans.map((plan) => {
+
+            plan.tags.sort((a, b) => {
+                if (a.name < b.name) {
+                    return -1;
+                }
+                if (a.name > b.name) {
+                    return 1;
+                }
+                return 0;
+            });
+
+            return plan.id;
+        });
+
+        categorizePlans()
     }
 
     const categorizePlans = () => {
@@ -128,8 +143,7 @@
             if(response.status == 200) {
                 plans.allPlans = parsedResponse
 
-                extractIdList()
-                categorizePlans()
+                afterFetchPlans()
 
                 if(loading.value) {
                     loading.value = false
