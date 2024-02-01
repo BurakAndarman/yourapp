@@ -172,6 +172,7 @@ public class UserServiceImpl implements UserService {
                    userPlan.getId(),
                    userPlan.getTitle(),
                    userPlan.getContent(),
+                   userPlan.getImage(),
                    userPlan.getKanbanList().toString(),
                    tagsDtoList
             );
@@ -226,6 +227,7 @@ public class UserServiceImpl implements UserService {
                         plansDto.getId(),
                         plansDto.getTitle(),
                         plansDto.getContent(),
+                        "", // For now
                         KanbanList.valueOf(plansDto.getKanbanList()),
                         user.get(),
                         existingPlansTagsRelations

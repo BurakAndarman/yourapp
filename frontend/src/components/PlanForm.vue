@@ -207,6 +207,12 @@
                         label="Content"
                         rows="3"
                     ></v-textarea>
+                    <v-file-input
+                        v-model="planModel.image"
+                        accept="image/png, image/jpeg"
+                        prepend-icon=""
+                        label="Image"
+                    ></v-file-input>
                     <v-select
                         v-model="planModel.kanbanList"
                         :items="kanbanLists"

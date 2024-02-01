@@ -27,6 +27,9 @@ public class Plans {
     @Column(name="content")
     private String content = "";
 
+    @Column(name="image")
+    private String image = "";
+
     @Enumerated(EnumType.STRING)
     @Column(name="kanban_list",nullable = false)
     private KanbanList kanbanList = KanbanList.TODO;

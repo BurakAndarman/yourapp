@@ -18,6 +18,8 @@ public class PlansDto {
 
     private String content;
 
+    private String image;
+
     private String kanbanList;
 
     private List<TagsDto> tags;
@@ -30,10 +32,11 @@ public class PlansDto {
 
     private boolean deleted = false;
 
-    public PlansDto(int id,String title, String content, String kanbanList, List<TagsDto> tags) {
+    public PlansDto(int id,String title, String content, String image, String kanbanList, List<TagsDto> tags) {
         this.id = id;
         this.title = title;
         this.content = content;
+        this.image = image;
         this.kanbanList = kanbanList;
         this.tags = tags;
     }
