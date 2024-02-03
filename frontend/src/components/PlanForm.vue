@@ -73,7 +73,7 @@
         props.utils.addNewPlan(planModel.value)
     }
 
-    const changePlan = () => {        
+    const changePlan = () => {
         props.closePlanForm()
 
         planModel.value.changed = true
@@ -169,6 +169,14 @@
         }
         
     }
+
+    const extractUrl = () => {
+       if(planModel.value.uploadedImage.length) {
+            planModel.value.image = URL.createObjectURL(planModel.value.uploadedImage[0]);
+       } else {
+            planModel.value.image = "";
+       }       
+    }
 </script>
 <template>
     <v-dialog
@@ -207,12 +215,22 @@
                         label="Content"
                         rows="3"
                     ></v-textarea>
-                    <v-file-input
-                        v-model="planModel.image"
-                        accept="image/png, image/jpeg"
-                        prepend-icon=""
-                        label="Image"
-                    ></v-file-input>
+                    <div class="d-flex ga-2">
+                        <v-file-input
+                            v-model="planModel.uploadedImage"
+                            @update:modelValue="extractUrl()"
+                            accept="image/png, image/jpeg"                            
+                            prepend-icon=""
+                            label="Image"
+                        ></v-file-input>
+                        <v-img  
+                            v-if="planModel.image"
+                            max-height="55"
+                            max-width="70"
+                            :src="planModel.image"
+                            cover
+                        ></v-img>
+                    </div>
                     <v-select
                         v-model="planModel.kanbanList"
                         :items="kanbanLists"

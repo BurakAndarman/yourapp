@@ -20,7 +20,11 @@
             today : [],
             done : []
         },
-        expandedPlan : 0,
+        expandedPlan : 0
+    })
+    const planImageOverlay = reactive({
+        isVisible : false,
+        url : ''
     })
     const planForm = reactive({
         planModel : {
@@ -30,6 +34,7 @@
             image : "",
             tags : [],
             kanbanList : 'TODO',
+            uploadedImage : null,
             created : false,
             changed : false,
             deleted : false
@@ -60,6 +65,20 @@
         categorizePlans()
     }
 
+    const beforeSavePlans = () => {
+        plans.allPlans.forEach((plan) => {
+            if(plan.uploadedImage) {
+
+                if(plan.uploadedImage.length) {
+                    plan.uploadedImage = plan.uploadedImage[0]
+                } else {
+                    plan.uploadedImage = null;
+                }
+
+            }
+        })
+    }
+
     const sortAllTags = () => {
         planForm.allTags.sort((a, b) => {
             if (a.title < b.title) {
@@ -87,6 +106,7 @@
             image: "",
             tags : [],
             kanbanList : 'TODO',
+            uploadedImage : null,
             created : false,
             changed : false,
             deleted : false
@@ -119,6 +139,8 @@
     const savePlans = async () => {
 
         try{
+            beforeSavePlans();
+
             const response = await fetch('http://localhost:8090/api/v1/user/plans',{
                 method : "POST",
                 headers : {
@@ -209,9 +231,11 @@
         openChangePlanForm : (id) => {
             plans.expandedPlan = 0
             const index = plans.idsPlans.indexOf(id)
-            const plan = JSON.parse(JSON.stringify(plans.allPlans[index])) // For deep copying the object
-            const allTags = []
+            const originalPlan = plans.allPlans[index]
 
+            const plan = Object.assign({},originalPlan) // For deep copying the object
+
+            const allTags = []            
             let lastAddedTags = localStorage.getItem('lastAddedTags')
 
             if(lastAddedTags) {
@@ -267,6 +291,10 @@
             plans.expandedPlan = 0;
         },
         currentExpandedPlan : () => plans.expandedPlan,
+        viewImage : (url) => {
+            planImageOverlay.url = url;
+            planImageOverlay.isVisible = true;
+        }
     }
 
     // Functions to be used in PlanForm subcomponent for changing plan
@@ -330,6 +358,16 @@
             <KanbanList title="Done" :plans="plans.categorizedPlans.done" :plansUtils="plansUtils"/>
         </div>
     </div>
+    <v-overlay
+        v-model="planImageOverlay.isVisible"
+        class="justify-center align-center"
+    >
+        <v-img
+            width="720"
+            height="720"
+            :src="planImageOverlay.url"
+        ></v-img>
+    </v-overlay>
     <PlanForm :planModelProp="planForm.planModel"
               :allTagsProp="planForm.allTags"
               :utils="planForm.utils"

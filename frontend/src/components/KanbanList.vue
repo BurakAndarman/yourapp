@@ -1,5 +1,6 @@
 <script setup>
 
+    // Props
     const props = defineProps({
         title: String,
         plans: Object,
@@ -58,9 +59,19 @@
                         v-show="props.plansUtils.currentExpandedPlan() === plan.id"
                     >
                         <v-card-item>
-                            <div :class="'d-flex align-baseline '+(plan.content ? 'justify-space-between' : 'justify-end')">
-                                <div v-if="plan.content" class="w-60">
-                                    {{ plan.content }}
+                            <div :class="'d-flex align-start '+((plan.content || plan.image) ? 'justify-space-between' : 'justify-end')">
+                                <div v-if="plan.content || plan.image" class="w-60 d-flex flex-column ga-6">
+                                    <div v-if="plan.content">
+                                        {{ plan.content }}
+                                    </div>
+                                    <v-img
+                                        v-if="plan.image"
+                                        class="w-50"
+                                        max-height="80"
+                                        :src="plan.image"
+                                        @click.stop="props.plansUtils.viewImage(plan.image)"
+                                        cover
+                                    ></v-img>
                                 </div>
                                 <div>
                                     <div class="d-flex">
