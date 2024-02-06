@@ -22,10 +22,11 @@
     const props = defineProps({
         planModelProp: Object,
         allTagsProp: Object,
+        selectedImageProp : Object,
         utils: Object,
         mode: String,
         isVisibleProp: Boolean,
-        closePlanForm: Function
+        planFormFuncs: Object,
     });
 
     // Models
@@ -38,6 +39,7 @@
 
     // Extra
     const allTags = ref([])
+    const selectedImage = ref([])
     const isVisible = ref(false)
     const isAddTagVisible = ref(false)        
     const validations = reactive({
@@ -52,6 +54,9 @@
     watch(() => props.allTagsProp, (allTagsProp) => {
         allTags.value = allTagsProp
     })
+    watch(() => props.selectedImageProp, (selectedImageProp) => {
+        selectedImage.value = selectedImageProp
+    })
     watch(() => props.isVisibleProp, (isVisibleProp) => {
         isVisible.value = isVisibleProp
     })
@@ -65,17 +70,26 @@
 
     // Functions
     const addPlan = () => {
-        props.closePlanForm()
+        props.planFormFuncs.closePlanForm()
 
         planModel.value.id = props.utils.generatePlanId()
+        
+        if(selectedImage.value.length) {
+           props.planFormFuncs.handleImageAssoc(selectedImage.value, planModel.value.id)
+        }
+
         planModel.value.created = true
 
         props.utils.addNewPlan(planModel.value)
     }
 
     const changePlan = () => {
-        props.closePlanForm()
+        props.planFormFuncs.closePlanForm()
 
+        if(props.planFormFuncs.imageAssocExists(planModel.value.id) || selectedImage.value.length) {
+            props.planFormFuncs.handleImageAssoc(selectedImage.value, planModel.value.id)
+        
+        }
         planModel.value.changed = true
 
         props.utils.changeExistingPlan(planModel.value)
@@ -171,8 +185,8 @@
     }
 
     const extractUrl = () => {
-       if(planModel.value.uploadedImage.length) {
-            planModel.value.image = URL.createObjectURL(planModel.value.uploadedImage[0]);
+       if(selectedImage.value.length) {
+            planModel.value.image = URL.createObjectURL(selectedImage.value[0]);
        } else {
             planModel.value.image = "";
        }       
@@ -182,7 +196,7 @@
     <v-dialog
         transition="dialog-bottom-transition"
         v-model="isVisible"
-        @click:outside="props.closePlanForm()"
+        @click:outside="props.planFormFuncs.closePlanForm()"
         width="auto"
     >
         <v-card
@@ -217,7 +231,7 @@
                     ></v-textarea>
                     <div class="d-flex ga-2">
                         <v-file-input
-                            v-model="planModel.uploadedImage"
+                            v-model="selectedImage"
                             @update:modelValue="extractUrl()"
                             accept="image/png, image/jpeg"                            
                             prepend-icon=""
@@ -269,7 +283,7 @@
                     <v-btn
                         variant="text"
                         color="cyan-darken-4"
-                        @click="props.closePlanForm()"
+                        @click="props.planFormFuncs.closePlanForm()"
                     >Close
                     </v-btn>
                     <v-btn

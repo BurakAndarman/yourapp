@@ -5,6 +5,7 @@ import com.example.SpringVue.Dto.NewsPreferencesDto;
 import com.example.SpringVue.Dto.PlansDto;
 import com.example.SpringVue.Dto.UserDto;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -20,6 +21,6 @@ public interface UserService {
 
     List<PlansDto> getPlans(String userName);
 
-    String savePlans(List<PlansDto> plansDtoList, String userName);
+    String savePlans(List<PlansDto> plansDtoList, String userName) throws IOException;
 
 }

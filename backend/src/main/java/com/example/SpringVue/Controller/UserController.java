@@ -5,11 +5,16 @@ import com.example.SpringVue.Dto.NewsPreferencesDto;
 import com.example.SpringVue.Dto.PlansDto;
 import com.example.SpringVue.Dto.UserDto;
 import com.example.SpringVue.Service.UserService;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -20,8 +25,11 @@ public class UserController {
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
+    private final ObjectMapper objectMapper;
+
+    public UserController(UserService userService,ObjectMapper objectMapper) {
         this.userService = userService;
+        this.objectMapper = objectMapper;
     }
 
     @PostMapping("/save")
@@ -67,13 +75,24 @@ public class UserController {
 
     }
 
-    @PostMapping("/plans")
-    public ResponseEntity<String> savePlans(@RequestBody List<PlansDto> plansDtoList, Authentication authentication) {
+    @PostMapping(value = "/plans",consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<String> savePlans(@RequestParam("plansDtoList") String plansDtoList, @RequestParam("images") List<MultipartFile> images, Authentication authentication) throws IOException {
 
+
+        images.stream().forEach(multipartFile -> {
+            System.out.println(multipartFile.getOriginalFilename());
+        });
+        List<PlansDto> plans = objectMapper.readValue(plansDtoList,new TypeReference<>() { });
+
+        System.out.println(plans.get(0).toString());
+
+        return new ResponseEntity<>("heyyy!", HttpStatus.OK);
+
+        /*
         String saveMessage = userService.savePlans(plansDtoList, authentication.getName());
 
         return new ResponseEntity<>(saveMessage, HttpStatus.OK);
-
+*/
     }
 
 }

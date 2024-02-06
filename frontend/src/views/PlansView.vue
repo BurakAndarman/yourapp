@@ -22,6 +22,7 @@
         },
         expandedPlan : 0
     })
+    const imagesAssoc = ref({});
     const planImageOverlay = reactive({
         isVisible : false,
         url : ''
@@ -34,11 +35,12 @@
             image : "",
             tags : [],
             kanbanList : 'TODO',
-            uploadedImage : null,
+            imageIndex : null,
             created : false,
             changed : false,
             deleted : false
         },
+        selectedImage : [],
         allTags : [],
         utils : {},
         isVisible : false,
@@ -65,19 +67,6 @@
         categorizePlans()
     }
 
-    const beforeSavePlans = () => {
-        plans.allPlans.forEach((plan) => {
-            if(plan.uploadedImage) {
-
-                if(plan.uploadedImage.length) {
-                    plan.uploadedImage = plan.uploadedImage[0]
-                } else {
-                    plan.uploadedImage = null;
-                }
-
-            }
-        })
-    }
 
     const sortAllTags = () => {
         planForm.allTags.sort((a, b) => {
@@ -106,7 +95,7 @@
             image: "",
             tags : [],
             kanbanList : 'TODO',
-            uploadedImage : null,
+            imageIndex : null,
             created : false,
             changed : false,
             deleted : false
@@ -131,6 +120,7 @@
 
         }
         
+        planForm.selectedImage = []
         planForm.utils = addPlanFormUtils
         planForm.mode = 'add'
         planForm.isVisible = true
@@ -139,15 +129,29 @@
     const savePlans = async () => {
 
         try{
-            beforeSavePlans();
+            const formData = new FormData();           
+
+            let counter = 0
+
+            for (const [id, image] of Object.entries(imagesAssoc.value)) {
+
+                if(image.length) {
+                    const index = plans.idsPlans.indexOf(Number(id));
+                    plans.allPlans[index].imageIndex = counter
+                    formData.append("images",image[0])
+                    counter++;
+                }
+                
+            }
+
+            formData.append('plansDtoList',JSON.stringify(plans.allPlans))
 
             const response = await fetch('http://localhost:8090/api/v1/user/plans',{
                 method : "POST",
                 headers : {
-                    "Content-Type" : "application/json",
                     "Authorization" : `Bearer ${auth.token}`
                 },
-                body: JSON.stringify(plans.allPlans)
+                body: formData
             });
 
             if(response.status == 401) {
@@ -159,7 +163,10 @@
 
                 statusDialog.openStatusDialog(successResponse,'success')
 
+                imagesAssoc.value = {}
+
                 await fetchPlans()
+                
             } else {
                 const errorResponse = await response.json();
 
@@ -280,6 +287,13 @@
                 sortAllTags()
             }
 
+            if((plan.id in imagesAssoc.value) && imagesAssoc.value[plan.id].length) {
+                const imageFile = imagesAssoc.value[plan.id][0]
+                planForm.selectedImage = [new File([imageFile], imageFile.name, { type: imageFile.type })] // For cloning the file
+            } else {
+                planForm.selectedImage = []
+            }
+
             planForm.utils = changePlanFormUtils;
             planForm.mode = 'change';
             planForm.isVisible = true;
@@ -317,10 +331,15 @@
     }
 
     // Other functions to be used in PlanForm subcomponent
-    const closePlanForm = () => {
-        planForm.isVisible = false;
+    const planFormFuncs = {
+        handleImageAssoc : (image, id) => {
+            imagesAssoc.value[id] = image;
+        },
+        imageAssocExists : (id) => (id in imagesAssoc.value),
+        closePlanForm : () => {
+            planForm.isVisible = false;
+        }
     }
-
 </script>
 <template>
     <div class="mx-auto" style="width:75%;">
@@ -370,9 +389,10 @@
     </v-overlay>
     <PlanForm :planModelProp="planForm.planModel"
               :allTagsProp="planForm.allTags"
+              :selectedImageProp="planForm.selectedImage"
               :utils="planForm.utils"
               :mode="planForm.mode"
               :isVisibleProp="planForm.isVisible"
-              :closePlanForm="closePlanForm"
+              :planFormFuncs="planFormFuncs"
     />
 </template>

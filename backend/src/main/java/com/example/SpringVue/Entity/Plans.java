@@ -43,9 +43,10 @@ public class Plans {
     @ToString.Exclude
     private Set<PlansTags> plansTags = new HashSet<>();
 
-    public Plans(String title, String content, KanbanList kanbanList, User user) {
+    public Plans(String title, String content, String image, KanbanList kanbanList, User user) {
         this.title = title;
         this.content = content;
+        this.image = image;
         this.kanbanList = kanbanList;
         this.user = user;
     }

@@ -24,9 +24,9 @@ public class PlansDto {
 
     private List<TagsDto> tags;
 
-    private MultipartFile uploadedImage = null;
-
     // Fields to be used in client for indicating certain actions
+
+    private Integer imageIndex = null;
 
     private boolean created = false;
 
@@ -34,7 +34,7 @@ public class PlansDto {
 
     private boolean deleted = false;
 
-    public PlansDto(int id,String title, String content, String image, String kanbanList, List<TagsDto> tags) {
+    public PlansDto(int id, String title, String content, String image, String kanbanList, List<TagsDto> tags) {
         this.id = id;
         this.title = title;
         this.content = content;

@@ -101,7 +101,6 @@ public class RestExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleException (Exception exc) {
-
         ErrorResponse error = new ErrorResponse();
 
         error.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
