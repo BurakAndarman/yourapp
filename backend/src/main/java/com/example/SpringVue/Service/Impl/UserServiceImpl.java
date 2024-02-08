@@ -14,7 +14,6 @@ import com.example.SpringVue.Exception.NewsPreferenceNotFound;
 import com.example.SpringVue.Exception.UserNotFound;
 import com.example.SpringVue.Repo.*;
 import com.example.SpringVue.Dto.UserDto;
-import com.example.SpringVue.Service.MediaService;
 import com.example.SpringVue.Service.NewsService;
 import com.example.SpringVue.Service.UserService;
 import com.example.SpringVue.Utils.EvictCache;
@@ -29,9 +28,8 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import javax.print.attribute.standard.Media;
-import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -186,7 +184,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public String savePlans(List<PlansDto> plansDtoList, String userName) {
+    public String savePlans(List<PlansDto> plansDtoList, List<MultipartFile> images, String userName) {
 
         Optional<com.example.SpringVue.Entity.User> user = userRepository.findById(userName);
 
@@ -198,15 +196,19 @@ public class UserServiceImpl implements UserService {
             if(plansDto.isCreated() && !plansDto.isDeleted()) {
 
                 String image = "";
-/*
-                if(plansDto.getUploadedImage() != null) {
-                    image = userUtils.savePlanImageToCloud(plansDto.getUploadedImage());
+                String imgPublicId = "";
+
+                if(plansDto.getImageIndex() != null) {
+                    HashMap<String,String> cloudResponse = userUtils.savePlanImageToCloud(images.get(plansDto.getImageIndex()));
+                    image = cloudResponse.get("image_url");
+                    imgPublicId = cloudResponse.get("public_id");
                 }
-*/
+
                 Plans newPlan = plansRepository.save(new Plans(
                         plansDto.getTitle(),
                         plansDto.getContent(),
                         image,
+                        imgPublicId,
                         KanbanList.valueOf(plansDto.getKanbanList()),
                         user.get()
                 ));
@@ -218,15 +220,18 @@ public class UserServiceImpl implements UserService {
                 Plans oldPlan = plansRepository.findById(plansDto.getId()).get();
 
                 String image = oldPlan.getImage();
-/*
-                if(plansDto.getUploadedImage() != null) {
+                String imgPublicId = oldPlan.getImgPublicId();
+
+                if(plansDto.getImageIndex() != null) {
                     if(!image.isEmpty()) {
-                        userUtils.deletePlanImageFromCloud(image);
+                        userUtils.deletePlanImageFromCloud(imgPublicId);
                     }
 
-                    image = userUtils.savePlanImageToCloud(plansDto.getUploadedImage());
+                    HashMap<String,String> cloudResponse = userUtils.savePlanImageToCloud(images.get(plansDto.getImageIndex()));
+                    image = cloudResponse.get("image_url");
+                    imgPublicId = cloudResponse.get("public_id");
                 }
-*/
+
                 Set<PlansTags> existingPlansTagsRelations = new HashSet<>();
 
                 if(!plansDto.getTags().isEmpty()) {
@@ -248,6 +253,7 @@ public class UserServiceImpl implements UserService {
                         plansDto.getTitle(),
                         plansDto.getContent(),
                         image,
+                        imgPublicId,
                         KanbanList.valueOf(plansDto.getKanbanList()),
                         user.get(),
                         existingPlansTagsRelations
@@ -264,11 +270,9 @@ public class UserServiceImpl implements UserService {
 
                 Plans planToBeDeleted = plansRepository.findById(plansDto.getId()).get();
 
-                /*
                 if(!planToBeDeleted.getImage().isEmpty()) {
-                    userUtils.deletePlanImageFromCloud(planToBeDeleted.getImage());
+                    userUtils.deletePlanImageFromCloud(planToBeDeleted.getImgPublicId());
                 }
-                 */
 
                 plansRepository.delete(planToBeDeleted);
 

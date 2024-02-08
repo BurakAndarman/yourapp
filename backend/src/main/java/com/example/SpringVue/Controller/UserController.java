@@ -76,23 +76,12 @@ public class UserController {
     }
 
     @PostMapping(value = "/plans",consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<String> savePlans(@RequestParam("plansDtoList") String plansDtoList, @RequestParam("images") List<MultipartFile> images, Authentication authentication) throws IOException {
-
-
-        images.stream().forEach(multipartFile -> {
-            System.out.println(multipartFile.getOriginalFilename());
-        });
+    public ResponseEntity<String> savePlans(@RequestParam("plansDtoList") String plansDtoList, @RequestParam(value = "images",required = false) List<MultipartFile> images, Authentication authentication) throws IOException {
         List<PlansDto> plans = objectMapper.readValue(plansDtoList,new TypeReference<>() { });
 
-        System.out.println(plans.get(0).toString());
-
-        return new ResponseEntity<>("heyyy!", HttpStatus.OK);
-
-        /*
-        String saveMessage = userService.savePlans(plansDtoList, authentication.getName());
+        String saveMessage = userService.savePlans(plans, images, authentication.getName());
 
         return new ResponseEntity<>(saveMessage, HttpStatus.OK);
-*/
     }
 
 }

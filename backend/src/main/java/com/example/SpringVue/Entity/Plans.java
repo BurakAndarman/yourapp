@@ -30,6 +30,9 @@ public class Plans {
     @Column(name="image")
     private String image = "";
 
+    @Column(name="img_public_id")
+    private String imgPublicId = "";
+
     @Enumerated(EnumType.STRING)
     @Column(name="kanban_list",nullable = false)
     private KanbanList kanbanList = KanbanList.TODO;
@@ -43,10 +46,11 @@ public class Plans {
     @ToString.Exclude
     private Set<PlansTags> plansTags = new HashSet<>();
 
-    public Plans(String title, String content, String image, KanbanList kanbanList, User user) {
+    public Plans(String title, String content, String image, String imgPublicId, KanbanList kanbanList, User user) {
         this.title = title;
         this.content = content;
         this.image = image;
+        this.imgPublicId = imgPublicId;
         this.kanbanList = kanbanList;
         this.user = user;
     }

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Optional;
 
 @Component
@@ -51,24 +52,25 @@ public class UserUtils {
 
     }
 
-    public String savePlanImageToCloud(MultipartFile uploadedImage) {
+    public HashMap<String, String> savePlanImageToCloud(MultipartFile uploadedImage) {
 
-        String image = "";
+        HashMap<String,String> uploadResponse;
 
         try {
-            image = mediaService.uploadFile(uploadedImage, "YourApp/Plans");
+            uploadResponse = mediaService.uploadFile(uploadedImage, "YourApp/Plans");
+
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }
 
-        return image;
+        return uploadResponse;
 
     }
 
-    public void deletePlanImageFromCloud(String fileName) {
+    public void deletePlanImageFromCloud(String publicId) {
 
         try {
-            mediaService.deleteFile(fileName, "YourApp/Plans");
+            mediaService.deleteFile(publicId);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }

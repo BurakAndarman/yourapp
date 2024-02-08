@@ -1,6 +1,7 @@
 package com.example.SpringVue.Service.Impl;
 
 import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.example.SpringVue.Service.MediaService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,21 +20,25 @@ public class MediaServiceImpl implements MediaService {
     }
 
     @Override
-    public void deleteFile(String fileName, String folderName) throws IOException {
+    public void deleteFile(String publicId) throws IOException {
 
-        HashMap<Object, Object> options = new HashMap<>();
-        options.put("folder", folderName);
-        cloudinary.uploader().destroy(fileName, options);
+        cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+
     }
 
     @Override
-    public String uploadFile(MultipartFile file, String folderName) throws IOException {
+    public HashMap<String,String> uploadFile(MultipartFile file, String folderName) throws IOException {
 
         HashMap<Object, Object> options = new HashMap<>();
         options.put("folder", folderName);
+
         Map uploadedFile = cloudinary.uploader().upload(file.getBytes(), options);
         String publicId = uploadedFile.get("public_id").toString();
 
-        return cloudinary.url().secure(true).generate(publicId);
+        HashMap<String,String> uploadResponse = new HashMap<>();
+        uploadResponse.put("public_id",publicId);
+        uploadResponse.put("image_url",cloudinary.url().secure(true).generate(publicId));
+
+        return uploadResponse;
     }
 }
