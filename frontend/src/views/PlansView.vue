@@ -240,7 +240,7 @@
             const index = plans.idsPlans.indexOf(id)
             const originalPlan = plans.allPlans[index]
 
-            const plan = Object.assign({},originalPlan) // For deep copying the object
+            const plan = JSON.parse(JSON.stringify(originalPlan)) // For deep copying the object
 
             const allTags = []            
             let lastAddedTags = localStorage.getItem('lastAddedTags')
