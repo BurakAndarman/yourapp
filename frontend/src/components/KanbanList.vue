@@ -15,11 +15,11 @@
         </div>
         <div v-if="plans.length"
              style="height: 63vh; scrollbar-width: thin;scrollbar-color: #CFD8DC white;"
-             class="overflow-y-auto pa-1"
+             class="overflow-y-auto pa-1 mt-8"
         >
             <v-card
                 v-for="(plan) in plans"
-                class="my-8 text-cyan-darken-4"
+                class="mb-8 text-cyan-darken-4"
                 :key="plan.id"
                 @click="props.plansUtils.currentExpandedPlan() === plan.id ? props.plansUtils.hidePlan() : props.plansUtils.expandPlan(plan.id)"
                 :ripple="false"
@@ -100,7 +100,7 @@
                 </v-expand-transition>
             </v-card>
         </div>
-        <div v-else class="pt-8 text-center text-disabled">
+        <div v-else class="mt-8 text-center text-disabled">
             {{ `${props.title} list is empty` }}
         </div>
     </div>
