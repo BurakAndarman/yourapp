@@ -1,6 +1,7 @@
 <script setup>
   import { useAuthStore } from '@/store/auth';
   import StatusDialog from '@/components/StatusDialog.vue';
+  import SavingIndicator from './components/SavingIndicator.vue';
 
   const auth = useAuthStore()
 
@@ -32,6 +33,7 @@
       </v-btn>
     </v-toolbar>
     <StatusDialog/>
+    <SavingIndicator/>
     <RouterView/>
 </template>
 

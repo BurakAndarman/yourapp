@@ -2,10 +2,13 @@
     import { reactive } from 'vue';
     import { useAuthStore } from '../store/auth';
     import { useStatusStore } from '../store/status';
+    import { useSavingStore } from '../store/saving';
 
     const auth = useAuthStore()
 
     const statusDialog = useStatusStore()
+
+    const saving = useSavingStore()
 
     const props = defineProps({
         fetchNewArticles: Function
@@ -61,6 +64,8 @@
 
             dialog.isVisible = false;
 
+            saving.showSavingIndicator()
+
             const response = await fetch('http://localhost:8090/api/v1/user/news-preferences',{
                 method : "PUT",
                 headers : {
@@ -74,11 +79,15 @@
             })
 
             if(response.status == 401) {
+                saving.closeSavingIndicator()
+
                 auth.logout();
             }           
 
             if(response.status == 200) {
                 const successResponse = await response.text()
+
+                saving.closeSavingIndicator()
 
                 statusDialog.openStatusDialog(successResponse,'success')
 
@@ -91,6 +100,7 @@
             }
 
         } catch(e) {
+            saving.closeSavingIndicator()
 
             statusDialog.openStatusDialog(e,'error')
 
