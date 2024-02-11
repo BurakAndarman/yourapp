@@ -6,9 +6,9 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EvictCache {
+public class CacheUtils {
 
-    private static Logger log = LoggerFactory.getLogger(EvictCache.class);
+    private static Logger log = LoggerFactory.getLogger(CacheUtils.class);
 
     @CacheEvict(value = "userNewsCache", key = "#userName")
     public void evictUserNews(String userName) {

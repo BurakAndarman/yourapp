@@ -191,6 +191,11 @@
             planModel.value.image = "";
        }       
     }
+
+    const deleteImage = () => {
+        selectedImage.value = [];
+        planModel.value.image = "";
+    }
 </script>
 <template>
     <v-dialog
@@ -237,13 +242,26 @@
                             prepend-icon=""
                             label="Image"
                         ></v-file-input>
-                        <v-img  
-                            v-if="planModel.image"
-                            max-height="55"
-                            max-width="70"
-                            :src="planModel.image"
-                            cover
-                        ></v-img>
+                        <v-hover v-slot="{ isHovering, props }">
+                            <v-img  
+                                v-if="planModel.image"
+                                @click="deleteImage()"
+                                max-height="55"
+                                max-width="70"
+                                :src="planModel.image"
+                                style="cursor: pointer;"
+                                v-bind="props"
+                                cover
+                            >
+                                <v-overlay
+                                    :model-value="isHovering"
+                                    contained
+                                    class="align-center justify-center"
+                                >
+                                    <v-icon icon="mdi-delete" color="white"></v-icon>
+                                </v-overlay>
+                            </v-img>
+                        </v-hover>                        
                     </div>
                     <v-select
                         v-model="planModel.kanbanList"

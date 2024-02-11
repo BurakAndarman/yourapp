@@ -16,7 +16,7 @@ import com.example.SpringVue.Repo.*;
 import com.example.SpringVue.Dto.UserDto;
 import com.example.SpringVue.Service.NewsService;
 import com.example.SpringVue.Service.UserService;
-import com.example.SpringVue.Utils.EvictCache;
+import com.example.SpringVue.Utils.CacheUtils;
 import com.example.SpringVue.Utils.KanbanList;
 import com.example.SpringVue.Utils.UserUtils;
 import jakarta.transaction.Transactional;
@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
 
     private final PlansTagsRepository plansTagsRepository;
 
-    private final EvictCache evictCache;
+    private final CacheUtils cacheUtils;
 
     private final UserUtils userUtils;
 
@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
                            NewsPreferencesRepository newsPreferencesRepository,
                            UserRepository userRepository, PlansRepository plansRepository,
                            TagsRepository tagsRepository, PlansTagsRepository plansTagsRepository,
-                           EvictCache evictCache, UserUtils userUtils){
+                           CacheUtils cacheUtils, UserUtils userUtils){
         this.userDetailsManager = userDetailsManager;
         this.newsService = newsService;
         this.newsPreferencesRepository = newsPreferencesRepository;
@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
         this.plansRepository = plansRepository;
         this.tagsRepository = tagsRepository;
         this.plansTagsRepository = plansTagsRepository;
-        this.evictCache = evictCache;
+        this.cacheUtils = cacheUtils;
         this.userUtils = userUtils;
     }
 
@@ -134,7 +134,7 @@ public class UserServiceImpl implements UserService {
 
         newsPreferencesRepository.save(newsPreferences);
 
-        evictCache.evictUserNews(userName);
+        cacheUtils.evictUserNews(userName);
 
         return "Changes recorded successfully";
 
@@ -230,6 +230,12 @@ public class UserServiceImpl implements UserService {
                     HashMap<String,String> cloudResponse = userUtils.savePlanImageToCloud(images.get(plansDto.getImageIndex()));
                     image = cloudResponse.get("image_url");
                     imgPublicId = cloudResponse.get("public_id");
+
+                } else if(plansDto.getImage().isEmpty() && !image.isEmpty()) {
+                    userUtils.deletePlanImageFromCloud(imgPublicId);
+
+                    image = "";
+                    imgPublicId = "";
                 }
 
                 Set<PlansTags> existingPlansTagsRelations = new HashSet<>();
