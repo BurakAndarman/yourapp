@@ -13,7 +13,10 @@
         <div class="text-center text-cyan-darken-4">
             <h3 class="text-h5">{{props.title}}</h3>
         </div>
-        <div v-if="plans.length">
+        <div v-if="plans.length"
+             style="height: 63vh; scrollbar-width: thin;scrollbar-color: #CFD8DC white;"
+             class="overflow-y-auto pa-1"
+        >
             <v-card
                 v-for="(plan) in plans"
                 class="my-8 text-cyan-darken-4"
