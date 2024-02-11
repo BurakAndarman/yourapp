@@ -16,7 +16,7 @@ export const useAuthStore = defineStore({
 
             const base64encodedData = Buffer.from(`${userName}:${password}`).toString('base64')
 
-            const response = await fetch('http://localhost:8090/api/v1/auth/token',{
+            const response = await fetch('http://localhost:8090/api/v1/user/token',{
                 method: 'GET',
                 headers: {
                     'Authorization': `Basic ${base64encodedData}`

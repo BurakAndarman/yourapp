@@ -32,7 +32,7 @@
     })
 
     const fetchArticles = async () => {
-        const response = await fetch('http://localhost:8090/api/v1/user/get-news',{
+        const response = await fetch('http://localhost:8090/api/v1/user/news',{
             method : "GET",
             headers : {
                 "Authorization" : `Bearer ${auth.token}`

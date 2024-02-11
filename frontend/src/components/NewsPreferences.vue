@@ -27,7 +27,7 @@
 
         try{
 
-            const response = await fetch('http://localhost:8090/api/v1/user/news-preferences',{
+            const response = await fetch('http://localhost:8090/api/v1/user/news/news-preferences',{
                 method : "GET",
                 headers : {
                     "Authorization" : `Bearer ${auth.token}`
@@ -66,7 +66,7 @@
 
             saving.showSavingIndicator()
 
-            const response = await fetch('http://localhost:8090/api/v1/user/news-preferences',{
+            const response = await fetch('http://localhost:8090/api/v1/user/news/news-preferences',{
                 method : "PUT",
                 headers : {
                     "Content-Type" : "application/json",

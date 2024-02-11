@@ -28,7 +28,7 @@
     }
 
     const register = async () => {
-        const response = await fetch('http://localhost:8090/api/v1/user/save',{
+        const response = await fetch('http://localhost:8090/api/v1/user',{
             method : "POST",
             headers : {
                 "Content-Type" : "application/json"
