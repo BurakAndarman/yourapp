@@ -6,7 +6,7 @@ import com.example.SpringVue.Exception.DuplicateUsername;
 import com.example.SpringVue.Exception.UserNotFound;
 import com.example.SpringVue.Repo.UserRepository;
 import com.example.SpringVue.Service.UserService;
-import com.example.SpringVue.Service.UserNewsService;
+import com.example.SpringVue.Service.NewsService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,16 +26,16 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    private final UserNewsService userNewsService;
+    private final NewsService newsService;
 
     private final JwtEncoder jwtEncoder;
 
     private final UserDetailsManager userDetailsManager;
 
-    public UserServiceImpl(UserRepository userRepository, UserNewsService userNewsService,
+    public UserServiceImpl(UserRepository userRepository, NewsService newsService,
                            JwtEncoder jwtEncoder, UserDetailsManager userDetailsManager) {
         this.userRepository = userRepository;
-        this.userNewsService = userNewsService;
+        this.newsService = newsService;
         this.jwtEncoder = jwtEncoder;
         this.userDetailsManager = userDetailsManager;
     }
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
         Optional<com.example.SpringVue.Entity.User> userFromDatabase = userRepository.findById(user.getUsername());
 
         if(userFromDatabase.isPresent()) {
-           userNewsService.saveNewsPreferences(user.getUsername(),userFromDatabase.get());
+           newsService.saveNewsPreferences(user.getUsername(),userFromDatabase.get());
         }
 
         return user.getUsername();

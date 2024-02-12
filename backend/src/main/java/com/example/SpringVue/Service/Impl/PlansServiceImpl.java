@@ -1,5 +1,6 @@
 package com.example.SpringVue.Service.Impl;
 
+import com.example.SpringVue.Components.MediaComponent;
 import com.example.SpringVue.Dto.PlansDto;
 import com.example.SpringVue.Dto.TagsDto;
 import com.example.SpringVue.Entity.Plans;
@@ -9,10 +10,9 @@ import com.example.SpringVue.Entity.User;
 import com.example.SpringVue.Repo.PlansRepository;
 import com.example.SpringVue.Repo.PlansTagsRepository;
 import com.example.SpringVue.Repo.TagsRepository;
-import com.example.SpringVue.Service.MediaService;
 import com.example.SpringVue.Service.PlansService;
 import com.example.SpringVue.Service.UserService;
-import com.example.SpringVue.Utils.KanbanList;
+import com.example.SpringVue.Enum.KanbanList;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,16 +31,16 @@ public class PlansServiceImpl implements PlansService {
 
     private final UserService userService;
 
-    private final MediaService mediaService;
+    private final MediaComponent mediaComponent;
 
     public PlansServiceImpl(PlansRepository plansRepository,
                             PlansTagsRepository plansTagsRepository,TagsRepository tagsRepository,
-                            UserService userService,MediaService mediaService) {
+                            UserService userService,MediaComponent mediaComponent) {
         this.plansRepository = plansRepository;
         this.plansTagsRepository = plansTagsRepository;
         this.tagsRepository = tagsRepository;
         this.userService = userService;
-        this.mediaService = mediaService;
+        this.mediaComponent = mediaComponent;
     }
 
     @Override
@@ -210,7 +210,7 @@ public class PlansServiceImpl implements PlansService {
         HashMap<String,String> uploadResponse;
 
         try {
-            uploadResponse = mediaService.uploadFile(uploadedImage, "YourApp/Plans");
+            uploadResponse = mediaComponent.uploadFile(uploadedImage, "YourApp/Plans");
 
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
@@ -223,7 +223,7 @@ public class PlansServiceImpl implements PlansService {
     public void deletePlanImageFromCloud(String publicId) {
 
         try {
-            mediaService.deleteFile(publicId);
+            mediaComponent.deleteFile(publicId);
         } catch (IOException e) {
             throw new RuntimeException(e.getMessage());
         }

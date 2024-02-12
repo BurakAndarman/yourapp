@@ -1,6 +1,6 @@
 package com.example.SpringVue.Entity;
 
-import com.example.SpringVue.Utils.KanbanList;
+import com.example.SpringVue.Enum.KanbanList;
 import jakarta.persistence.*;
 import lombok.*;
 
