@@ -1,6 +1,6 @@
 package com.example.SpringVue.Service.Impl;
 
-import com.example.SpringVue.Components.MediaComponent;
+import com.example.SpringVue.Component.MediaComponent;
 import com.example.SpringVue.Dto.PlansDto;
 import com.example.SpringVue.Dto.TagsDto;
 import com.example.SpringVue.Entity.Plans;

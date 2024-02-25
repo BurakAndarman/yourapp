@@ -1,4 +1,4 @@
-package com.example.SpringVue.Components;
+package com.example.SpringVue.Component;
 
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.TopHeadlines;
 import org.springframework.beans.factory.annotation.Value;

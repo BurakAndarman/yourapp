@@ -1,4 +1,4 @@
-package com.example.SpringVue.Components;
+package com.example.SpringVue.Component;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;

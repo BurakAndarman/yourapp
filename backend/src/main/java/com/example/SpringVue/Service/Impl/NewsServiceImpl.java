@@ -1,6 +1,6 @@
 package com.example.SpringVue.Service.Impl;
 
-import com.example.SpringVue.Components.NewsComponent;
+import com.example.SpringVue.Component.NewsComponent;
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.Article;
 import com.example.SpringVue.Dto.NewsApi.TopHeadlines.TopHeadlines;
 import com.example.SpringVue.Dto.NewsPreferencesDto;
@@ -9,7 +9,8 @@ import com.example.SpringVue.Entity.User;
 import com.example.SpringVue.Exception.NewsPreferenceNotFound;
 import com.example.SpringVue.Repo.NewsPreferencesRepository;
 import com.example.SpringVue.Service.NewsService;
-import com.example.SpringVue.Components.CacheOperations;
+import com.example.SpringVue.Component.CacheOperations;
+import com.example.SpringVue.Service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
@@ -24,13 +25,16 @@ public class NewsServiceImpl implements NewsService {
 
     private final NewsPreferencesRepository newsPreferencesRepository;
 
+    private final UserService userService;
+
     private final NewsComponent newsComponent;
 
     private final CacheOperations cacheOperations;
 
-    public NewsServiceImpl(NewsPreferencesRepository newsPreferencesRepository, NewsComponent newsComponent, CacheOperations cacheOperations) {
-        this.newsComponent = newsComponent;
+    public NewsServiceImpl(NewsPreferencesRepository newsPreferencesRepository, UserService userService, NewsComponent newsComponent, CacheOperations cacheOperations) {
         this.newsPreferencesRepository = newsPreferencesRepository;
+        this.userService = userService;
+        this.newsComponent = newsComponent;
         this.cacheOperations = cacheOperations;
     }
 
@@ -40,13 +44,16 @@ public class NewsServiceImpl implements NewsService {
 
         log.info("Trying to fetch data from 3rd party api");
 
+        NewsPreferences validatedNewsPreferences;
+
         Optional<NewsPreferences> newsPreferences = newsPreferencesRepository.findById(userName);
 
         if(newsPreferences.isEmpty()) {
-            throw new NewsPreferenceNotFound("Couldn't find any user preference",userName);
+            User user = userService.getUser(userName);
+            validatedNewsPreferences = newsPreferencesRepository.save(new NewsPreferences(userName, user));
+        } else {
+            validatedNewsPreferences = newsPreferences.get();
         }
-
-        NewsPreferences validatedNewsPreferences = newsPreferences.get();
 
         String preferredLanguage = validatedNewsPreferences.getLanguage();
         Boolean topicsEmpty = validatedNewsPreferences.getInterestedTopics().isEmpty();
@@ -70,11 +77,6 @@ public class NewsServiceImpl implements NewsService {
         });
 
         return articlesMap;
-    }
-
-    @Override
-    public void saveNewsPreferences(String userName, User user) {
-        newsPreferencesRepository.save(new NewsPreferences(userName,user));
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.example.SpringVue.Components;
+package com.example.SpringVue.Component;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
