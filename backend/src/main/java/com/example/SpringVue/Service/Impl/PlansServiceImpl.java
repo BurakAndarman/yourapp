@@ -184,7 +184,7 @@ public class PlansServiceImpl implements PlansService {
     }
 
     // Checks if passed tag exists in db. If exists, gets it and if not creates new one. Then adds a relation record.
-    public void createNewPlansTagsRelation(Plans plan, TagsDto tagsDto) {
+    private void createNewPlansTagsRelation(Plans plan, TagsDto tagsDto) {
 
         Optional<Tags> tag = tagsRepository.findFirstByNameAndColor(tagsDto.getName(), tagsDto.getColor());
 
@@ -205,7 +205,7 @@ public class PlansServiceImpl implements PlansService {
 
     }
 
-    public HashMap<String, String> savePlanImageToCloud(MultipartFile uploadedImage) {
+    private HashMap<String, String> savePlanImageToCloud(MultipartFile uploadedImage) {
 
         HashMap<String,String> uploadResponse;
 
@@ -220,7 +220,7 @@ public class PlansServiceImpl implements PlansService {
 
     }
 
-    public void deletePlanImageFromCloud(String publicId) {
+    private void deletePlanImageFromCloud(String publicId) {
 
         try {
             mediaComponent.deleteFile(publicId);

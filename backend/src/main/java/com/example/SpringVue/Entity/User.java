@@ -29,6 +29,11 @@ public class User {
     @ToString.Exclude
     private NewsPreferences newsPreferences;
 
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    @ToString.Exclude
+    private WeatherPreferences weatherPreferences;
+
     @OneToMany(mappedBy = "user")
     @ToString.Exclude
     private Set<Plans> plans;
