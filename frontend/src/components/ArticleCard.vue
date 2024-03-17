@@ -11,7 +11,7 @@
 </script>
 <template>
     <v-card
-      class="d-flex flex-column"
+      class="d-flex flex-column bg-background"
       width="400"
     >
       <v-img

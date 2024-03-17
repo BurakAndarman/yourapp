@@ -57,9 +57,9 @@
 </script>
 
 <template>
-    <div class="d-flex align-center justify-center" style="height: 100vh;background-color: #006064;">
+    <div class="d-flex align-center justify-center h-screen bg-primary">
         <div class="d-flex justify-center">
-            <v-card class="px-8 pb-8 pt-4" width="400">
+            <v-card class="px-8 pb-8 pt-4 bg-surface" width="400">
                 <v-card-item class="pl-0 pb-8 text-center">
                     <v-card-title class="text-h4">YourApp</v-card-title>
                     <v-card-subtitle class="pt-4 text-subtitle-1">Welcome To YourApp</v-card-subtitle>
@@ -76,6 +76,7 @@
                     ></v-text-field>
                     <v-alert
                         v-if="error"
+                        color="error"
                         variant="tonal"
                         type="error"
                         class="mb-5 mt-5"

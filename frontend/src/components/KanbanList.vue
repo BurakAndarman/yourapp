@@ -10,16 +10,16 @@
 </script>
 <template>
     <div class="w-100">
-        <div class="text-center text-cyan-darken-4">
+        <div class="text-center text-primary">
             <h3 class="text-h5">{{props.title}}</h3>
         </div>
         <div v-if="plans.length"
-             style="height: 63vh; scrollbar-width: thin;scrollbar-color: #CFD8DC white;"
+             style="height: 63vh; scrollbar-width: thin;scrollbar-color: #424242 #212121;"
              class="overflow-y-auto pa-1 mt-8"
         >
             <v-card
                 v-for="(plan) in plans"
-                class="mb-8 text-cyan-darken-4"
+                class="mb-8 text-primary bg-background"
                 :key="plan.id"
                 @click="props.plansUtils.currentExpandedPlan() === plan.id ? props.plansUtils.hidePlan() : props.plansUtils.expandPlan(plan.id)"
                 :ripple="false"
@@ -42,14 +42,14 @@
                         <div class="d-flex">
                             <v-btn
                                 v-if="plan.kanbanList !== 'TODO'"
-                                color="cyan-darken-4"
+                                color="primary"
                                 variant="text"
                                 icon="mdi-chevron-left"
                                 @click.stop="props.plansUtils.changeList(plan.id, (plan.kanbanList === 'DONE' ? 'TODAY' : plan.kanbanList === 'TODAY' ? 'THIS_WEEK' : 'TODO'))">
                             </v-btn>
                             <v-btn
                                 v-if="plan.kanbanList !== 'DONE'"
-                                color="cyan-darken-4"
+                                color="primary"
                                 variant="text"
                                 icon="mdi-chevron-right"
                                 @click.stop="props.plansUtils.changeList(plan.id, (plan.kanbanList === 'TODO' ? 'THIS_WEEK' : plan.kanbanList === 'THIS_WEEK' ? 'TODAY' : 'DONE'))">
@@ -59,6 +59,7 @@
                 </v-card-item>
                 <v-expand-transition>
                     <v-card
+                        class="bg-background"
                         v-show="props.plansUtils.currentExpandedPlan() === plan.id"
                     >
                         <v-card-item>
@@ -79,14 +80,14 @@
                                 <div>
                                     <div class="d-flex">
                                         <v-btn
-                                            color="red-darken-4"
+                                            color="error"
                                             variant="text"
                                             icon="mdi-delete"
                                             @click.stop="props.plansUtils.deletePlan(plan.id)"
                                             >
                                         </v-btn>
                                         <v-btn
-                                            color="orange-darken-4"
+                                            color="warning"
                                             variant="text"
                                             icon="mdi-pencil"
                                             @click.stop="props.plansUtils.openChangePlanForm(plan.id)"

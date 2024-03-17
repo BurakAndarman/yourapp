@@ -12,7 +12,7 @@
 <template>
     <v-toolbar
       v-if="auth.user"
-      color="cyan-darken-4">
+      color="primary">
       <v-toolbar-title class="pl-5">YourApp</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn to="/" icon>

@@ -353,41 +353,43 @@
     }
 </script>
 <template>
-    <div class="mx-auto" style="width:75%;">
-        <div class="my-14 d-flex justify-space-between align-center">
-            <div class="text-cyan-darken-4">
-                <h1 class="text-h2">Plans</h1>
-                <h2 class="text-h4 mt-3">Organize Your Plans</h2>
+    <div class="bg-surface py-14">
+        <div class="mx-auto" style="width:75%;">
+            <div class="d-flex justify-space-between align-center">
+                <div class="text-primary">
+                    <h1 class="text-h2">Plans</h1>
+                    <h2 class="text-h4 mt-3">Organize Your Plans</h2>
+                </div>
+                <div>
+                    <v-btn
+                        color="primary"    
+                        variant="tonal"
+                        icon="mdi-plus"
+                        class="me-3"
+                        @click="openAddPlanForm()">
+                    </v-btn>
+                    <v-btn
+                        color="primary"
+                        variant="tonal"
+                        icon="mdi-content-save"
+                        @click="savePlans()">
+                    </v-btn>
+                </div>
             </div>
-            <div>
-                <v-btn
-                    color="cyan-darken-4"    
-                    variant="tonal"
-                    icon="mdi-plus"
-                    class="me-3"
-                    @click="openAddPlanForm()">
-                </v-btn>
-                <v-btn
-                    color="cyan-darken-4"
-                    variant="tonal"
-                    icon="mdi-content-save"
-                    @click="savePlans()">
-                </v-btn>
+            <div v-if="loading" class="mt-10 h-screen">
+                <div class="d-flex flex-column justify-center align-center ga-3">
+                    <v-progress-circular color="primary" indeterminate :size="50"></v-progress-circular>
+                    <p class="text-primary">Loading</p>
+                </div>
+            </div>
+            <div v-else class="my-10 d-flex justify-space-between ga-8">
+                <KanbanList title="Todo" :plans="plans.categorizedPlans.todo" :plansUtils="plansUtils"/>
+                <KanbanList title="This Week" :plans="plans.categorizedPlans.this_week" :plansUtils="plansUtils"/>
+                <KanbanList title="Today" :plans="plans.categorizedPlans.today" :plansUtils="plansUtils"/>
+                <KanbanList title="Done" :plans="plans.categorizedPlans.done" :plansUtils="plansUtils"/>
             </div>
         </div>
-        <div v-if="loading" class="mt-10 d-flex justify-center">
-            <div class="d-flex flex-column justify-center align-center ga-3">
-                <v-progress-circular color="cyan-darken-4" indeterminate :size="50"></v-progress-circular>
-                <p class="text-cyan-darken-4">Loading</p>
-            </div>
-        </div>
-        <div v-else class="my-10 d-flex justify-space-between ga-8">
-            <KanbanList title="Todo" :plans="plans.categorizedPlans.todo" :plansUtils="plansUtils"/>
-            <KanbanList title="This Week" :plans="plans.categorizedPlans.this_week" :plansUtils="plansUtils"/>
-            <KanbanList title="Today" :plans="plans.categorizedPlans.today" :plansUtils="plansUtils"/>
-            <KanbanList title="Done" :plans="plans.categorizedPlans.done" :plansUtils="plansUtils"/>
-        </div>
-    </div>
+    </div>    
     <v-overlay
         v-model="planImageOverlay.isVisible"
         class="justify-center align-center"

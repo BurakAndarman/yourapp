@@ -111,7 +111,7 @@
 </script>
 <template>
     <v-btn
-        color="cyan-darken-4"
+        color="primary"
         variant="tonal"
         icon="mdi-cog"
         @click="openDialog">
@@ -122,27 +122,28 @@
         width="auto"
     >
         <v-card
+            class="bg-surface"
             width="400"
         >
             <v-toolbar
-                color="cyan-darken-4"
+                color="primary"
                 title="News Preferences"
             ></v-toolbar>
             <div class="ma-4">
                 <div>
-                    <div class="text-center text-cyan-darken-4 font-weight-bold my-1">Categories</div>
+                    <div class="text-center text-primary font-weight-bold my-1">Categories</div>
                     <v-checkbox v-for="(category,index) in allCategories"
                     v-model="dialog.selectedCategories"
                     :label="category"
                     :value="category"
-                    color="cyan-darken-4"
+                    color="primary"
                     :key="index"
                     hide-details
                     >
                     </v-checkbox>
                 </div>
                 <div>
-                    <div class="text-center text-cyan-darken-4 font-weight-bold mt-1 mb-5">Languages</div>
+                    <div class="text-center text-primary font-weight-bold mt-1 mb-5">Languages</div>
                     <v-select
                     v-model="dialog.selectedLanguage"
                     :items="allLanguages"
@@ -153,13 +154,13 @@
             <v-card-actions class="justify-end">
                 <v-btn
                     variant="text"
-                    color="cyan-darken-4"
+                    color="primary"
                     @click="dialog.isVisible = false"
                 >Close
                 </v-btn>
                 <v-btn
                     variant="tonal"
-                    color="cyan-darken-4"
+                    color="primary"
                     @click="closeWithOk"
                 >Ok
                 </v-btn>

@@ -205,20 +205,21 @@
         width="auto"
     >
         <v-card
+            class="bg-surface"
             width="400"
         >
             <v-form
                 v-model="validations.plan"
             >
                 <v-toolbar
-                    color="cyan-darken-4"
+                    color="primary"
                     :title="props.mode === 'add' ? 'Add Plan' : 'Change Plan'"
                 ></v-toolbar>
                 <div class="ma-4">
                     <v-text-field
                         v-model="planModel.title"
                         :rules="[rules.length(50),rules.required]"
-                        color="cyan-darken-4"
+                        color="primary"
                         label="Title"
                         counter="50"
                     >
@@ -230,7 +231,7 @@
                         auto-grow
                         counter="255"
                         :rules="[rules.length(255)]"
-                        color="cyan-darken-4"
+                        color="primary"
                         label="Content"
                         rows="3"
                     ></v-textarea>
@@ -258,7 +259,7 @@
                                     contained
                                     class="align-center justify-center"
                                 >
-                                    <v-icon icon="mdi-delete" color="white"></v-icon>
+                                    <v-icon icon="mdi-delete" color="surface"></v-icon>
                                 </v-overlay>
                             </v-img>
                         </v-hover>                        
@@ -289,7 +290,7 @@
                         </v-select>
                         <div class="mt-3">
                             <v-btn
-                                color="cyan-darken-4"
+                                color="primary"
                                 variant="tonal"                                    
                                 @click="isAddTagVisible = true">
                                 Add
@@ -300,14 +301,14 @@
                 <v-card-actions class="justify-end">
                     <v-btn
                         variant="text"
-                        color="cyan-darken-4"
+                        color="primary"
                         @click="props.planFormFuncs.closePlanForm()"
                     >Close
                     </v-btn>
                     <v-btn
                         :disabled="!validations.plan"
                         variant="tonal"
-                        color="cyan-darken-4"
+                        color="primary"
                         @click="props.mode === 'add' ? addPlan() : changePlan()"
                     >Ok
                     </v-btn>
@@ -332,14 +333,14 @@
                     <v-text-field
                         v-model="tagModel.name"
                         :rules="[rules.length(15),rules.required]"
-                        color="cyan-darken-4"
+                        color="primary"
                         label="Tag"
                     >
                     </v-text-field>
                     <v-btn
                         :disabled="!validations.addTag"
                         variant="tonal"
-                        color="cyan-darken-4"
+                        color="primary"
                         @click="addTag()"
                     >OK
                     </v-btn>
