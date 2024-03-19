@@ -14,7 +14,7 @@
             <h3 class="text-h5">{{props.title}}</h3>
         </div>
         <div v-if="plans.length"
-             style="height: 63vh; scrollbar-width: thin;scrollbar-color: #424242 #212121;"
+             style="height: 63vh; scrollbar-width: thin;scrollbar-color: var(--v-theme-surface) var(--v-theme-background);"
              class="overflow-y-auto pa-1 mt-8"
         >
             <v-card

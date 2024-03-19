@@ -25,12 +25,25 @@ const darkTheme = {
   },
 };
 
+const lightTheme = {
+  light : true,
+  colors : {
+    background : colors.grey.lighten4,
+    surface : colors.grey.lighten5,
+    primary : colors.teal.darken3,
+    secondary : colors.green.darken3,
+    error : colors.red.darken3,
+    warning : colors.orange.darken3
+  }
+}
+
 app.use(createPinia())
 app.use(createVuetify({
     theme : {
-      defaultTheme: "darkTheme",
+      defaultTheme: "lightTheme",
       themes: {
-        darkTheme
+        darkTheme,
+        lightTheme
       }
     },
     components,
