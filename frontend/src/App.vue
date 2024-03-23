@@ -1,5 +1,5 @@
 <script setup>
-  import { ref } from "vue";
+  import { ref, watch } from "vue";
   import { useAuthStore } from '@/store/auth';
   import StatusDialog from '@/components/StatusDialog.vue';
   import SavingIndicator from './components/SavingIndicator.vue';
@@ -10,12 +10,63 @@
   const theme = useTheme();
   const darkMode = ref(false);
 
+  watch(() => auth.user , (newUserValue) => {
+    if(newUserValue) {
+      let modePreferences = localStorage.getItem('modePreferences')
+
+      if(modePreferences) {
+
+        modePreferences = JSON.parse(modePreferences)
+        const userModePreference = modePreferences.find(modePreference => modePreference.userName === newUserValue)
+
+        if(userModePreference && theme.global.name.value !== userModePreference.mode) {
+            theme.global.name.value = userModePreference.mode
+            darkMode.value = userModePreference.mode === 'darkTheme'
+        }
+
+        if(!userModePreference) {
+          if(modePreferences.length === 5) {
+            modePreferences.pop()
+          }
+
+          modePreferences.unshift({
+              userName : newUserValue,
+              mode : 'lightTheme'
+          })
+
+          localStorage.setItem('modePreferences', JSON.stringify(modePreferences))
+
+          theme.global.name.value = 'lightTheme'
+          darkMode.value = false
+
+        }
+
+      } else {
+
+        localStorage.setItem('modePreferences', JSON.stringify([{
+            userName : newUserValue,
+            mode : 'lightTheme'
+        }]))
+
+      }
+    }
+  })
+
   const toggleTheme = () => {
-    theme.global.name.value = darkMode.value ? "darkTheme" : "lightTheme";
+    const newTheme = darkMode.value ? "darkTheme" : "lightTheme"
+
+    const modePreferences = JSON.parse(localStorage.getItem('modePreferences'))
+    const index = modePreferences.findIndex(modePreference => modePreference.userName === auth.user)
+    modePreferences[index].mode = newTheme
+    localStorage.setItem('modePreferences', JSON.stringify(modePreferences))
+
+    theme.global.name.value = newTheme
   }
 
   const logout = () => {
-    auth.logout()
+    theme.global.name.value = "lightTheme"
+    darkMode.value = false
+    auth.logout()   
   }
 </script>
 <template>
