@@ -114,7 +114,7 @@
         color="primary"
         variant="tonal"
         icon="mdi-cog"
-        @click="openDialog">
+        @click="openDialog()">
     </v-btn>
     <v-dialog
         transition="dialog-bottom-transition"
@@ -161,7 +161,7 @@
                 <v-btn
                     variant="tonal"
                     color="primary"
-                    @click="closeWithOk"
+                    @click="closeWithOk()"
                 >Ok
                 </v-btn>
             </v-card-actions>

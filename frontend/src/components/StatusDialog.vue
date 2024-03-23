@@ -7,7 +7,9 @@
     <v-dialog 
         width="500"
         v-model="statusDialog.isVisible">
-        <v-card :title="statusDialog.status === 'error' ? 'Error' : 'Success'">
+        <v-card class="bg-surface"
+                :title="statusDialog.status === 'error' ? 'Error' : 'Success'"
+        >
             <v-card-text> 
                 {{ statusDialog.message }}
             </v-card-text>

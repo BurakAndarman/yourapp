@@ -107,15 +107,22 @@
 
         if(lastAddedTags) {
             lastAddedTags = JSON.parse(lastAddedTags)
+            const userLastAddedTags = lastAddedTags.find(obj => obj.userName === auth.user)
 
-            planForm.allTags = lastAddedTags.map((tag) => {
-                return {
-                    title : tag.name,
-                    value : tag
-                }
-            })
+            if(userLastAddedTags) {
+                planForm.allTags = userLastAddedTags.tags.map((tag) => {
+                    return {
+                        title : tag.name,
+                        value : tag
+                    }
+                })
 
-            sortAllTags()
+                sortAllTags()
+
+            } else {
+                planForm.allTags = []
+
+            }
 
         } else {
             planForm.allTags = []
@@ -255,31 +262,37 @@
 
             const allTags = []            
             let lastAddedTags = localStorage.getItem('lastAddedTags')
+            let userLastAddedTags = null
 
             if(lastAddedTags) {
                 lastAddedTags = JSON.parse(lastAddedTags)
-                lastAddedTags = lastAddedTags.filter((tag) => {
+                userLastAddedTags = lastAddedTags.find(obj => obj.userName === auth.user)
 
-                    let notFoundInPlanTags = true;
+                if(userLastAddedTags) {
+                    userLastAddedTags = userLastAddedTags.tags.filter((tag) => {
 
-                    for (const planTag of plan.tags) {
-                        if(planTag.name === tag.name && planTag.color === tag.color) {
-                            notFoundInPlanTags = false;
-                            break;
+                        let notFoundInPlanTags = true;
+
+                        for (const planTag of plan.tags) {
+                            if(planTag.name === tag.name && planTag.color === tag.color) {
+                                notFoundInPlanTags = false;
+                                break;
+                            }
                         }
-                    }
 
-                    return notFoundInPlanTags;
-                })
+                        return notFoundInPlanTags;
+                    })
 
-                lastAddedTags = lastAddedTags.map((tag) => {
-                    return {
-                        title : tag.name,
-                        value : tag
-                    }
-                })
+                    userLastAddedTags = userLastAddedTags.map((tag) => {
+                        return {
+                            title : tag.name,
+                            value : tag
+                        }
+                    })
 
-                allTags.push(...lastAddedTags)
+                    allTags.push(...userLastAddedTags)
+                }
+
             }
 
             const planTags = plan.tags.map((tag) => {
@@ -294,7 +307,7 @@
             planForm.planModel = plan;
 
             planForm.allTags = allTags;
-            if(lastAddedTags) {
+            if(userLastAddedTags) {
                 sortAllTags()
             }
 
@@ -382,7 +395,7 @@
                     <p class="text-primary">Loading</p>
                 </div>
             </div>
-            <div v-else class="my-10 d-flex justify-space-between ga-8">
+            <div v-else class="mt-10 h-screen d-flex justify-space-between ga-8">
                 <KanbanList title="Todo" :plans="plans.categorizedPlans.todo" :plansUtils="plansUtils"/>
                 <KanbanList title="This Week" :plans="plans.categorizedPlans.this_week" :plansUtils="plansUtils"/>
                 <KanbanList title="Today" :plans="plans.categorizedPlans.today" :plansUtils="plansUtils"/>

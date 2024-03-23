@@ -1,5 +1,5 @@
 <script setup>
-  import { ref, watch } from "vue";
+  import { ref, onMounted, watch } from "vue";
   import { useAuthStore } from '@/store/auth';
   import StatusDialog from '@/components/StatusDialog.vue';
   import SavingIndicator from './components/SavingIndicator.vue';
@@ -9,6 +9,15 @@
 
   const theme = useTheme();
   const darkMode = ref(false);
+
+  onMounted(() => {
+    if(auth.user) {
+      const modePreferences = JSON.parse(localStorage.getItem('modePreferences'))
+      const userModePreference = modePreferences.find(modePreference => modePreference.userName === auth.user)
+      theme.global.name.value = userModePreference.mode
+      darkMode.value = userModePreference.mode === 'darkTheme'
+    }
+  })
 
   watch(() => auth.user , (newUserValue) => {
     if(newUserValue) {
@@ -49,6 +58,9 @@
         }]))
 
       }
+    } else {
+      theme.global.name.value = "lightTheme"
+      darkMode.value = false
     }
   })
 
@@ -64,9 +76,7 @@
   }
 
   const logout = () => {
-    theme.global.name.value = "lightTheme"
-    darkMode.value = false
-    auth.logout()   
+    auth.logout()
   }
 </script>
 <template>

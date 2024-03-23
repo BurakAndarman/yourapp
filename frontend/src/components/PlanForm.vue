@@ -1,5 +1,6 @@
 <script setup>
     import { ref, reactive, watch } from 'vue';
+    import { useAuthStore } from '@/store/auth';
 
     // Constants
     const kanbanLists = [
@@ -28,6 +29,9 @@
         isVisibleProp: Boolean,
         planFormFuncs: Object,
     });
+
+    // Store
+    const auth = useAuthStore()
 
     // Models
     const planModel = ref({})
@@ -127,21 +131,46 @@
             planModel.value.tags.push(tagModel.value)
             sortTags('planModelTags')
 
-            // We don't sort these here because we want to keep them chronogically in local storage
             let lastAddedTags = localStorage.getItem('lastAddedTags')
 
             if(lastAddedTags) {
                 lastAddedTags = JSON.parse(lastAddedTags)
+                const index = lastAddedTags.findIndex(obj => obj.userName === auth.user)
 
-                if(lastAddedTags.length === 5) {
-                    lastAddedTags.pop()
-                }
+                if(index !== -1) {
+                    // We don't sort these here because we want to keep them chronogically in local storage                    
+                    const tags = lastAddedTags[index].tags
 
-                lastAddedTags.unshift(tagModel.value)
-                localStorage.setItem('lastAddedTags', JSON.stringify(lastAddedTags))
+                    if(tags.length === 5) {
+                        tags.pop()
+                    }
+
+                    tags.unshift(tagModel.value)
+
+                    lastAddedTags[index].tags = tags
+
+                    localStorage.setItem('lastAddedTags', JSON.stringify(lastAddedTags))
+
+                } else {
+
+                    if(lastAddedTags.length === 5) {
+                        lastAddedTags.pop()
+                    }
+
+                    lastAddedTags.unshift({
+                        userName : auth.user,
+                        tags : [tagModel.value]
+                    })
+
+                    localStorage.setItem('lastAddedTags', JSON.stringify(lastAddedTags))
+
+                }                
 
             } else {
-                localStorage.setItem('lastAddedTags',JSON.stringify([tagModel.value]))
+                localStorage.setItem('lastAddedTags', JSON.stringify([{
+                    userName : auth.user,
+                    tags : [tagModel.value]
+                }]))
 
             }
 

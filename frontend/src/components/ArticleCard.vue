@@ -34,7 +34,7 @@
       <v-spacer>
       </v-spacer>
       <v-card-actions>
-        <v-btn :href="article.url" target="_blank" class="font-weight-bold" color="cyan-accent-4">
+        <v-btn :href="article.url" target="_blank" class="font-weight-bold" color="primary">
           Read More
         </v-btn>
       </v-card-actions>
