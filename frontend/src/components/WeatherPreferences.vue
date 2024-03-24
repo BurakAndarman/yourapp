@@ -93,6 +93,7 @@
 
     const handleSelectedCityChange = () => {
         if(typeof autocomplete.city === 'object' && autocomplete.city !== null) {
+            // TODO : Check if the city is in the cities list before pushing
             weatherDialog.form.cities.push(autocomplete.city)
         }
     }
@@ -101,15 +102,7 @@
         weatherDialog.form.cities.splice(index,1)
     }
 
-    const changeOrder = (mode, index) => {
-        let otherIndex = 0
-
-        if(mode === 'up') {
-            otherIndex = index - 1        
-        } else {
-            otherIndex = index + 1
-        }
-
+    const changeOrder = (index, otherIndex) => {
         [weatherDialog.form.cities[otherIndex], weatherDialog.form.cities[index]] = [weatherDialog.form.cities[index], weatherDialog.form.cities[otherIndex]]
     }
 
@@ -185,12 +178,12 @@
                                             <v-icon v-if="index !== 0"
                                                     icon="mdi-chevron-up"
                                                     color="primary"
-                                                    @click="changeOrder('up', index)"
+                                                    @click="changeOrder(index, index - 1)"
                                             />
                                             <v-icon v-if="index !== weatherDialog.form.cities.length - 1"
                                                     icon="mdi-chevron-down"
                                                     color="primary"
-                                                    @click="changeOrder('down', index)"
+                                                    @click="changeOrder(index, index + 1)"
                                             />
                                         </div>
                                     </div>
