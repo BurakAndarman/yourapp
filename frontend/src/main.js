@@ -28,7 +28,7 @@ const darkTheme = {
 const lightTheme = {
   light : true,
   colors : {
-    background : colors.grey.lighten4,
+    background : colors.grey.lighten3,
     surface : colors.grey.lighten5,
     primary : colors.teal.darken3,
     secondary : colors.green.darken3,
