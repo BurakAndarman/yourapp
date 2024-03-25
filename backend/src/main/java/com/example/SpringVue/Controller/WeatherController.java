@@ -26,6 +26,8 @@ public class WeatherController {
 
         List<City> cities = weatherService.getCities(query);
 
+        System.out.println(cities.toString());
+
         return new ResponseEntity<>(cities, HttpStatus.OK);
 
     }

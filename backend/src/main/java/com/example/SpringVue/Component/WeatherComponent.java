@@ -1,10 +1,12 @@
 package com.example.SpringVue.Component;
 
+import com.example.SpringVue.Dto.WeatherApi.Forecast.ForecastWrapper;
 import com.example.SpringVue.Dto.WeatherApi.Search.City;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -26,9 +28,20 @@ public class WeatherComponent {
 
         String requestUrl = baseUrl + "search.json?q=" + query + "&key=" + key;
 
-        List<City> cities = restTemplate.getForObject(requestUrl, List.class);
+        List<City> cities = Arrays.asList(restTemplate.getForEntity(requestUrl, City[].class).getBody());
 
         return cities;
 
     }
+
+    public ForecastWrapper forecast(int cityId, int days) {
+
+        String requestUrl = baseUrl + "forecast.json?q=id:" + cityId + "&days=" + days + "&aqi=no&alerts=no&key=" + key;
+
+        ForecastWrapper forecastWrapper = restTemplate.getForObject(requestUrl, ForecastWrapper.class);
+
+        return forecastWrapper;
+
+    }
+
 }

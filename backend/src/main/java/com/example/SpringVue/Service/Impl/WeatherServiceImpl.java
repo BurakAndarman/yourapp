@@ -1,6 +1,7 @@
 package com.example.SpringVue.Service.Impl;
 
 import com.example.SpringVue.Component.WeatherComponent;
+import com.example.SpringVue.Dto.WeatherApi.Forecast.ForecastWrapper;
 import com.example.SpringVue.Dto.WeatherApi.Search.City;
 import com.example.SpringVue.Repo.WeatherPreferencesCitiesRepository;
 import com.example.SpringVue.Repo.WeatherPreferencesRepository;
@@ -36,6 +37,10 @@ public class WeatherServiceImpl implements WeatherService {
     @Override
     public List<City> getCities(String query) {
         return weatherComponent.search(query);
+    }
+
+    public ForecastWrapper getForecasts() {
+        return null;
     }
 
 }
