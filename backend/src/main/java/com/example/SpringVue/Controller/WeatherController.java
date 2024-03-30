@@ -1,13 +1,12 @@
 package com.example.SpringVue.Controller;
 
+import com.example.SpringVue.Dto.WeatherPreferencesDto;
 import com.example.SpringVue.Service.WeatherService;
 import com.example.SpringVue.Dto.WeatherApi.Search.City;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,6 +28,24 @@ public class WeatherController {
         System.out.println(cities.toString());
 
         return new ResponseEntity<>(cities, HttpStatus.OK);
+
+    }
+
+    @GetMapping("/weather-preferences")
+    public ResponseEntity<WeatherPreferencesDto> getWeatherPreferences(Authentication authentication) {
+
+        WeatherPreferencesDto weatherPreferencesDto = weatherService.getWeatherPreferences(authentication.getName());
+
+        return new ResponseEntity<>(weatherPreferencesDto, HttpStatus.OK);
+
+    }
+
+    @PutMapping("/weather-preferences")
+    public ResponseEntity<String> updateWeatherPreferences(@RequestBody WeatherPreferencesDto weatherPreferencesDto, Authentication authentication) {
+
+        String updateMessage = weatherService.updateWeatherPreferences(weatherPreferencesDto, authentication.getName());
+
+        return new ResponseEntity<>(updateMessage, HttpStatus.OK);
 
     }
 

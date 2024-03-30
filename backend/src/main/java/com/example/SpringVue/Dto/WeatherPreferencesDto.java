@@ -9,10 +9,12 @@ import java.util.List;
 @ToString
 @Getter
 @Setter
-public class NewsPreferencesDto {
+public class WeatherPreferencesDto {
 
-    private String language;
+    private String format;
 
-    private List<String> interestedTopics;
+    private String look;
+
+    private List<WeatherPreferencesCitiesDto> cities;
 
 }

@@ -1,5 +1,5 @@
 <script setup>
-    import { reactive,onMounted } from 'vue';
+    import { reactive } from 'vue';
     import { useAuthStore } from '../store/auth';
     import { useStatusStore } from '../store/status';
     import { useSavingStore } from '../store/saving';
@@ -45,11 +45,6 @@
         loading : false
     })
 
-    // Functions
-    onMounted(() => {
-        // TODO: Write here a fetch for bringing user weather preferences
-    })
-
     const filterCities = async () => {
         
         try{
@@ -92,9 +87,12 @@
     }
 
     const handleSelectedCityChange = () => {
-        if(typeof autocomplete.city === 'object' && autocomplete.city !== null) {
-            // TODO : Check if the city is in the cities list before pushing
-            weatherDialog.form.cities.push(autocomplete.city)
+        if(typeof autocomplete.city === 'object' && autocomplete.city !== null && !weatherDialog.form.cities.find(city => city.cityId === autocomplete.city.id)) {
+            weatherDialog.form.cities.push({
+                cityId : autocomplete.city.id,
+                name : autocomplete.city.name,
+                orderNo : weatherDialog.form.cities.length
+            })
         }
     }
 
@@ -106,12 +104,43 @@
         [weatherDialog.form.cities[otherIndex], weatherDialog.form.cities[index]] = [weatherDialog.form.cities[index], weatherDialog.form.cities[otherIndex]]
     }
 
-    const openWeatherDialog = () => {
-        weatherDialog.isVisible = true
+    const openWeatherDialog = async () => {
+
+        try{
+
+            const response = await fetch('http://localhost:8090/api/v1/user/weather/weather-preferences',{
+                method : "GET",
+                headers : {
+                    "Authorization" : `Bearer ${auth.token}`
+                }
+            });
+
+            if(response.status == 401) {
+                auth.logout();
+            }
+
+            const parsedResponse = await response.json();
+
+            if(response.status == 200) {
+                weatherDialog.form.format = parsedResponse.format
+                weatherDialog.form.look = parsedResponse.look
+                weatherDialog.form.cities = parsedResponse.cities.sort((a,b) => a.orderNo - b.orderNo)
+
+                weatherDialog.isVisible = true
+
+            } else {
+
+                throw new Error(parsedResponse.message)
+
+            }
+
+        } catch(e) {
+            statusDialog.openStatusDialog(e,'error')
+        }
     }
 
     const closeWithOk = () => {
-
+        
     }
 </script>
 <template>

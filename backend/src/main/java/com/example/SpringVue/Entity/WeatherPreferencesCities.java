@@ -25,17 +25,22 @@ public class WeatherPreferencesCities {
     @Column(name = "city_id", nullable = false)
     private int cityId;
 
+    @Column(name = "name", nullable = false, length = 50)
+    private String name;
+
     @Column(name = "order_no", nullable = false)
     private int orderNo = 0;
 
-    public WeatherPreferencesCities(WeatherPreferences weatherPreferences, int cityId) {
+    public WeatherPreferencesCities(WeatherPreferences weatherPreferences, int cityId, String name) {
         this.weatherPreferences = weatherPreferences;
         this.cityId = cityId;
+        this.name = name;
     }
 
-    public WeatherPreferencesCities(WeatherPreferences weatherPreferences, int cityId, int orderNo) {
+    public WeatherPreferencesCities(WeatherPreferences weatherPreferences, int cityId, String name, int orderNo) {
         this.weatherPreferences = weatherPreferences;
         this.cityId = cityId;
+        this.name = name;
         this.orderNo = orderNo;
     }
 

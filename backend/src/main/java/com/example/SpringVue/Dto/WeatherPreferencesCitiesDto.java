@@ -7,10 +7,12 @@ import lombok.*;
 @ToString
 @Getter
 @Setter
-public class UserDto {
+public class WeatherPreferencesCitiesDto {
 
-    private String userName;
+    private int cityId;
 
-    private String password;
+    private String name;
+
+    private int orderNo;
 
 }

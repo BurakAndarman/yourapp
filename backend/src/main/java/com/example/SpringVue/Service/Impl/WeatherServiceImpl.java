@@ -3,6 +3,10 @@ package com.example.SpringVue.Service.Impl;
 import com.example.SpringVue.Component.WeatherComponent;
 import com.example.SpringVue.Dto.WeatherApi.Forecast.ForecastWrapper;
 import com.example.SpringVue.Dto.WeatherApi.Search.City;
+import com.example.SpringVue.Dto.WeatherPreferencesCitiesDto;
+import com.example.SpringVue.Dto.WeatherPreferencesDto;
+import com.example.SpringVue.Entity.WeatherPreferences;
+import com.example.SpringVue.Entity.WeatherPreferencesCities;
 import com.example.SpringVue.Repo.WeatherPreferencesCitiesRepository;
 import com.example.SpringVue.Repo.WeatherPreferencesRepository;
 import com.example.SpringVue.Service.UserService;
@@ -11,7 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class WeatherServiceImpl implements WeatherService {
@@ -38,6 +43,51 @@ public class WeatherServiceImpl implements WeatherService {
     public List<City> getCities(String query) {
         return weatherComponent.search(query);
     }
+
+    @Override
+    public WeatherPreferencesDto getWeatherPreferences(String userName) {
+
+        Optional<WeatherPreferences> weatherPreferences = weatherPreferencesRepository.findById(userName);
+
+        if(weatherPreferences.isEmpty()) {
+            throw new RuntimeException("Couldn't find any user preference (Username that caused the error: "+userName+")");
+        }
+
+        WeatherPreferences userWeatherPreferences = weatherPreferences.get();
+
+        String format = userWeatherPreferences.getFormat();
+        String look = userWeatherPreferences.getLook();
+        List<WeatherPreferencesCitiesDto> weatherPreferencesCitiesDtos = userWeatherPreferences.getWeatherPreferencesCities().stream().map(weatherPreferencesCities -> new WeatherPreferencesCitiesDto(
+                weatherPreferencesCities.getCityId(),
+                weatherPreferencesCities.getName(),
+                weatherPreferencesCities.getOrderNo()
+        )).toList();
+
+
+        return new WeatherPreferencesDto(format, look, weatherPreferencesCitiesDtos);
+    }
+
+    @Override
+    public String updateWeatherPreferences(WeatherPreferencesDto weatherPreferencesDto, String userName) {
+
+        WeatherPreferences userWeatherPreferences = weatherPreferencesRepository.findById(userName).get();
+
+        userWeatherPreferences.setFormat(weatherPreferencesDto.getFormat());
+        userWeatherPreferences.setLook(weatherPreferencesDto.getLook());
+
+        Set<WeatherPreferencesCities> weatherPreferencesCities = weatherPreferencesDto.getCities().stream()
+                .map(weatherPreferencesCitiesDto -> new WeatherPreferencesCities(
+                    userWeatherPreferences,
+                    weatherPreferencesCitiesDto.getCityId(),
+                    weatherPreferencesCitiesDto.getName(),
+                    weatherPreferencesCitiesDto.getOrderNo()
+                )).collect(Collectors.toSet());
+
+        userWeatherPreferences.setWeatherPreferencesCities(weatherPreferencesCities);
+
+        return "Changes recorded successfully";
+    }
+
 
     public ForecastWrapper getForecasts() {
         return null;
