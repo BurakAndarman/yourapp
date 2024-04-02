@@ -45,6 +45,7 @@
         loading : false
     })
 
+    // Functions
     const filterCities = async () => {
         
         try{
@@ -139,8 +140,56 @@
         }
     }
 
-    const closeWithOk = () => {
-        
+    const closeWithOk = async () => {
+
+        try {
+
+            weatherDialog.form.cities.forEach((city, index) => {
+                city.orderNo = index
+            })
+
+            weatherDialog.isVisible = false;
+
+            saving.showSavingIndicator()
+
+            const response = await fetch('http://localhost:8090/api/v1/user/weather/weather-preferences',{
+                method : "PUT",
+                headers : {
+                    "Content-Type" : "application/json",
+                    "Authorization" : `Bearer ${auth.token}`
+                },
+                body : JSON.stringify({
+                    "format" : weatherDialog.form.format,
+                    "look" : weatherDialog.form.look,
+                    "cities" : weatherDialog.form.cities
+                })
+            })
+
+            if(response.status == 401) {
+                saving.closeSavingIndicator()
+
+                auth.logout();
+            }           
+
+            if(response.status == 200) {
+                const successResponse = await response.text()
+
+                saving.closeSavingIndicator()
+
+                statusDialog.openStatusDialog(successResponse,'success')
+
+            } else {
+                const errorResponse = await response.json()
+
+                throw new Error(errorResponse.message)
+            }
+
+        } catch(e) {
+            saving.closeSavingIndicator()
+
+            statusDialog.openStatusDialog(e,'error')
+
+        }
     }
 </script>
 <template>
@@ -184,8 +233,8 @@
                         />
                     </template>
                 </v-autocomplete>
-                <div class="mt-1 mb-5">
-                    <div class="text-center text-primary font-weight-bold mb-2">Selected Cities</div>
+                <div class="mt-1 mb-8">
+                    <div class="text-center text-primary font-weight-bold mb-2">Cities</div>
                     <div class="d-flex flex-column ga-2">
                         <v-card v-for="(city,index) in weatherDialog.form.cities"
                             class="bg-background"
@@ -196,7 +245,7 @@
                                     <div class="w-50">
                                         {{ `${index + 1}. ${city.name}` }}
                                     </div>
-                                    <div class="d-flex align-center ga-2">
+                                    <div v-if="index != 0" class="d-flex align-center ga-2">
                                         <v-btn
                                             color="error"
                                             variant="text"
@@ -204,7 +253,7 @@
                                             @click="deleteCity(index)"
                                         />
                                         <div class="d-flex flex-column">
-                                            <v-icon v-if="index !== 0"
+                                            <v-icon v-if="index !== 1"
                                                     icon="mdi-chevron-up"
                                                     color="primary"
                                                     @click="changeOrder(index, index - 1)"

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 @Entity
@@ -31,9 +32,23 @@ public class WeatherPreferences {
     @ToString.Exclude
     private User user;
 
-    @OneToMany(mappedBy = "weatherPreferences", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "weatherPreferences", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, orphanRemoval = true)
     @ToString.Exclude
     private Set<WeatherPreferencesCities> weatherPreferencesCities = new HashSet<>();
+
+    public void addCity(WeatherPreferencesCities weatherPreferencesCities) {
+        this.weatherPreferencesCities.add(weatherPreferencesCities);
+    }
+
+    public void removeCities(Set<WeatherPreferencesCities> weatherPreferencesCitiesToRemove) {
+        for (Iterator<WeatherPreferencesCities> iterator = this.weatherPreferencesCities.iterator(); iterator.hasNext();) {
+            WeatherPreferencesCities weatherPreferencesCitiesInEntity = iterator.next();
+
+            if(weatherPreferencesCitiesToRemove.contains(weatherPreferencesCitiesInEntity)) {
+                iterator.remove();
+            }
+        }
+    }
 
     public WeatherPreferences(String userName, User user) {
         this.userName = userName;

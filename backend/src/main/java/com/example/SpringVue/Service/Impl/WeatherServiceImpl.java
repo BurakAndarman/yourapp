@@ -75,15 +75,37 @@ public class WeatherServiceImpl implements WeatherService {
         userWeatherPreferences.setFormat(weatherPreferencesDto.getFormat());
         userWeatherPreferences.setLook(weatherPreferencesDto.getLook());
 
-        Set<WeatherPreferencesCities> weatherPreferencesCities = weatherPreferencesDto.getCities().stream()
-                .map(weatherPreferencesCitiesDto -> new WeatherPreferencesCities(
-                    userWeatherPreferences,
-                    weatherPreferencesCitiesDto.getCityId(),
-                    weatherPreferencesCitiesDto.getName(),
-                    weatherPreferencesCitiesDto.getOrderNo()
-                )).collect(Collectors.toSet());
+        List<Integer> currentCityIds = new ArrayList<>();
 
-        userWeatherPreferences.setWeatherPreferencesCities(weatherPreferencesCities);
+        weatherPreferencesDto.getCities().stream().forEach(weatherPreferencesCitiesDto -> {
+            currentCityIds.add(weatherPreferencesCitiesDto.getCityId());
+
+            WeatherPreferencesCities weatherPreferencesCity = userWeatherPreferences.getWeatherPreferencesCities().stream()
+                    .filter(weatherPreferencesCities -> weatherPreferencesCities.getCityId() == weatherPreferencesCitiesDto.getCityId())
+                    .findAny()
+                    .orElse(null);
+
+            if(weatherPreferencesCity == null) {
+                userWeatherPreferences.addCity(new WeatherPreferencesCities(
+                        userWeatherPreferences,
+                        weatherPreferencesCitiesDto.getCityId(),
+                        weatherPreferencesCitiesDto.getName(),
+                        weatherPreferencesCitiesDto.getOrderNo()
+                ));
+
+            } else {
+                weatherPreferencesCity.setOrderNo(weatherPreferencesCitiesDto.getOrderNo());
+
+            }
+        });
+
+        Set<WeatherPreferencesCities> weatherPreferencesCitiesToRemove = userWeatherPreferences.getWeatherPreferencesCities().stream()
+                .filter(weatherPreferencesCities -> !currentCityIds.contains(weatherPreferencesCities.getCityId()))
+                .collect(Collectors.toSet());
+
+        userWeatherPreferences.removeCities(weatherPreferencesCitiesToRemove);
+
+        weatherPreferencesRepository.save(userWeatherPreferences);
 
         return "Changes recorded successfully";
     }
