@@ -35,16 +35,17 @@ public class WeatherPreferences {
     @ToString.Exclude
     private Set<WeatherPreferencesCities> weatherPreferencesCities = new HashSet<>();
 
+    public WeatherPreferences(String userName, User user) {
+        this.userName = userName;
+        this.user = user;
+    }
+
     public void addCity(WeatherPreferencesCities weatherPreferencesCities) {
         this.weatherPreferencesCities.add(weatherPreferencesCities);
     }
 
     public void removeCities(Set<WeatherPreferencesCities> weatherPreferencesCitiesToRemove) {
         this.weatherPreferencesCities.removeAll(weatherPreferencesCitiesToRemove);
-    }
-
-    public void removeCity(WeatherPreferencesCities weatherPreferencesCities) {
-        this.weatherPreferencesCities.remove(weatherPreferencesCities);
     }
 
     public WeatherPreferencesCities getFirstCityByOrderNo(int orderNo) {
@@ -59,11 +60,6 @@ public class WeatherPreferences {
                 .filter(weatherPreferencesCities -> weatherPreferencesCities.getCityId() == cityId)
                 .findFirst()
                 .orElse(null);
-    }
-
-    public WeatherPreferences(String userName, User user) {
-        this.userName = userName;
-        this.user = user;
     }
 
 }

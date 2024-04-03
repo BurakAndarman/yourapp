@@ -2,7 +2,6 @@ package com.example.SpringVue.Component;
 
 import com.example.SpringVue.Dto.WeatherApi.Forecast.ForecastWrapper;
 import com.example.SpringVue.Dto.WeatherApi.Search.City;
-import com.example.SpringVue.Service.Impl.NewsServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
