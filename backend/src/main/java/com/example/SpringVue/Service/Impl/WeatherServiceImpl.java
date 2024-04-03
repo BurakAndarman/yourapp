@@ -84,7 +84,7 @@ public class WeatherServiceImpl implements WeatherService {
             } else if (newUserLocationCity.getOrderNo() != 0) {
                 WeatherPreferencesCities userCity = userWeatherPreferences.getFirstCityByOrderNo(0);
 
-                userWeatherPreferences.removeCity(userCity);
+                userCity.setOrderNo(newUserLocationCity.getOrderNo());
                 newUserLocationCity.setOrderNo(0);
 
                 userWeatherPreferences = weatherPreferencesRepository.save(userWeatherPreferences);
