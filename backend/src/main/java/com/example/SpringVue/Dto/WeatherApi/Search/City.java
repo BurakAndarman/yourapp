@@ -13,7 +13,7 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class City implements Serializable {
 
-    private long id;
+    private int id;
 
     private String name;
 

@@ -2,7 +2,11 @@ package com.example.SpringVue.Component;
 
 import com.example.SpringVue.Dto.WeatherApi.Forecast.ForecastWrapper;
 import com.example.SpringVue.Dto.WeatherApi.Search.City;
+import com.example.SpringVue.Service.Impl.NewsServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -11,6 +15,8 @@ import java.util.List;
 
 @Component
 public class WeatherComponent {
+
+    private static Logger log = LoggerFactory.getLogger(WeatherComponent.class);
 
     private final String baseUrl;
 
@@ -34,9 +40,25 @@ public class WeatherComponent {
 
     }
 
-    public ForecastWrapper forecast(int cityId, int days) {
+    public City search(double latitude, double longitude) {
 
-        String requestUrl = baseUrl + "forecast.json?q=id:" + cityId + "&days=" + days + "&aqi=no&alerts=no&key=" + key;
+        String requestUrl = baseUrl + "search.json?q=" + latitude + "," + longitude + "&key=" + key;
+
+        City city = Arrays.asList(restTemplate.getForEntity(requestUrl, City[].class).getBody()).stream()
+                .findFirst()
+                .orElse(null);
+
+        return city;
+
+    }
+
+
+    @Cacheable(value = "forecastCache", key = "#cityId")
+    public ForecastWrapper forecast(int cityId) {
+
+        log.info("Trying to fetch forecasts for city with city id " + cityId);
+
+        String requestUrl = baseUrl + "forecast.json?q=id:" + cityId + "&days=5&aqi=no&alerts=no&key=" + key;
 
         ForecastWrapper forecastWrapper = restTemplate.getForObject(requestUrl, ForecastWrapper.class);
 

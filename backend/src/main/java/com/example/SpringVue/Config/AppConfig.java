@@ -2,6 +2,7 @@ package com.example.SpringVue.Config;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.example.SpringVue.Dto.WeatherApi.Forecast.ForecastWrapper;
 import org.ehcache.config.CacheConfiguration;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.ExpiryPolicyBuilder;
@@ -55,18 +56,28 @@ public class AppConfig {
     @Bean
     public CacheManager EhcacheManager() {
 
-        CacheConfiguration<String, HashMap> cacheConfig = CacheConfigurationBuilder
+        CacheConfiguration<String, HashMap> newsCacheConfig = CacheConfigurationBuilder
                 .newCacheConfigurationBuilder(String.class,HashMap.class, ResourcePoolsBuilder.newResourcePoolsBuilder()
                         .offheap(10, MemoryUnit.MB)
                         .build())
                 .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofHours(5)))
                 .build();
 
+        CacheConfiguration<String, ForecastWrapper> forecastCacheConfig = CacheConfigurationBuilder
+                .newCacheConfigurationBuilder(String.class,ForecastWrapper.class, ResourcePoolsBuilder.newResourcePoolsBuilder()
+                        .offheap(10, MemoryUnit.MB)
+                        .build())
+                .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofHours(3)))
+                .build();
+
         CachingProvider cachingProvider = Caching.getCachingProvider();
         CacheManager cacheManager = cachingProvider.getCacheManager();
 
-        javax.cache.configuration.Configuration<String, HashMap> configuration = Eh107Configuration.fromEhcacheCacheConfiguration(cacheConfig);
-        cacheManager.createCache("userNewsCache",configuration);
+        javax.cache.configuration.Configuration<String, HashMap> newsCacheConfiguration = Eh107Configuration.fromEhcacheCacheConfiguration(newsCacheConfig);
+        javax.cache.configuration.Configuration<String, ForecastWrapper> forecastCacheConfiguration = Eh107Configuration.fromEhcacheCacheConfiguration(forecastCacheConfig);
+
+        cacheManager.createCache("userNewsCache",newsCacheConfiguration);
+        cacheManager.createCache("forecastCache",forecastCacheConfiguration);
 
         return cacheManager;
     }

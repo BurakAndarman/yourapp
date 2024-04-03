@@ -3,12 +3,15 @@ package com.example.SpringVue.Dto.WeatherApi.Forecast.Current;
 import com.example.SpringVue.Dto.WeatherApi.Forecast.Condition;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter
@@ -16,20 +19,25 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Current implements Serializable {
 
-    @JsonFormat(pattern="dd.MM.yyyy HH:mm:ss")
-    private LocalDateTime last_updated;
+    @JsonProperty("last_updated")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime lastUpdated;
 
-    private double temp_c;
+    @JsonProperty("temp_c")
+    private double tempC;
 
     private Condition condition;
 
-    private double wind_kph;
+    @JsonProperty("wind_kph")
+    private double windKph;
 
-    private String wind_dir;
+    @JsonProperty("wind_dir")
+    private String windDir;
 
     private double humidity;
 
-    private double feelslike_c;
+    @JsonProperty("feelslike_c")
+    private double feelslikeC;
 
     private double uv;
 

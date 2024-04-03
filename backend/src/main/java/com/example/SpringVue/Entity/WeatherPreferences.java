@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 @Entity
@@ -41,13 +40,25 @@ public class WeatherPreferences {
     }
 
     public void removeCities(Set<WeatherPreferencesCities> weatherPreferencesCitiesToRemove) {
-        for (Iterator<WeatherPreferencesCities> iterator = this.weatherPreferencesCities.iterator(); iterator.hasNext();) {
-            WeatherPreferencesCities weatherPreferencesCitiesInEntity = iterator.next();
+        this.weatherPreferencesCities.removeAll(weatherPreferencesCitiesToRemove);
+    }
 
-            if(weatherPreferencesCitiesToRemove.contains(weatherPreferencesCitiesInEntity)) {
-                iterator.remove();
-            }
-        }
+    public void removeCity(WeatherPreferencesCities weatherPreferencesCities) {
+        this.weatherPreferencesCities.remove(weatherPreferencesCities);
+    }
+
+    public WeatherPreferencesCities getFirstCityByOrderNo(int orderNo) {
+        return this.weatherPreferencesCities.stream()
+                .filter(weatherPreferencesCities -> weatherPreferencesCities.getOrderNo() == orderNo)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public WeatherPreferencesCities getFirstCityByCityId(int cityId) {
+        return this.weatherPreferencesCities.stream()
+                .filter(weatherPreferencesCities -> weatherPreferencesCities.getCityId() == cityId)
+                .findFirst()
+                .orElse(null);
     }
 
     public WeatherPreferences(String userName, User user) {

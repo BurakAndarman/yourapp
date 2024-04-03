@@ -1,5 +1,6 @@
 package com.example.SpringVue.Controller;
 
+import com.example.SpringVue.Dto.ForecastsDto;
 import com.example.SpringVue.Dto.WeatherPreferencesDto;
 import com.example.SpringVue.Service.WeatherService;
 import com.example.SpringVue.Dto.WeatherApi.Search.City;
@@ -18,6 +19,15 @@ public class WeatherController {
 
     public WeatherController(WeatherService weatherService) {
         this.weatherService = weatherService;
+    }
+
+    @GetMapping
+    public ResponseEntity<ForecastsDto> getForecasts(@RequestParam double latitude, @RequestParam double longitude, Authentication authentication) {
+
+        ForecastsDto forecastsDto = weatherService.getForecasts(latitude, longitude, authentication.getName());
+
+        return new ResponseEntity<>(forecastsDto, HttpStatus.OK);
+
     }
 
     @GetMapping("/cities")
