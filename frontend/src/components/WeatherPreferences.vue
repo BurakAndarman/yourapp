@@ -24,6 +24,11 @@
         }
     ]
 
+    // Props
+    const props = defineProps({
+        fetchNewWeatherInfo: Function
+    });
+
     // Stores
     const auth = useAuthStore()
     const statusDialog = useStatusStore()
@@ -178,6 +183,8 @@
 
                 statusDialog.openStatusDialog(successResponse,'success')
 
+                props.fetchNewWeatherInfo()
+
             } else {
                 const errorResponse = await response.json()
 
@@ -223,7 +230,7 @@
                     clearable
                     return-object
                     item-title="name"
-                    label="Cities"
+                    label="Locations"
                 >
                     <template v-slot:item="{ props, item }">
                         <v-list-item
@@ -234,7 +241,7 @@
                     </template>
                 </v-autocomplete>
                 <div class="mt-1 mb-8">
-                    <div class="text-center text-primary font-weight-bold mb-2">Cities</div>
+                    <div class="text-center text-primary font-weight-bold mb-2">Locations</div>
                     <div class="d-flex flex-column ga-2">
                         <v-card v-for="(city,index) in weatherDialog.form.cities"
                             class="bg-background"

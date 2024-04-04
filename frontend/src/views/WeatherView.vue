@@ -77,7 +77,7 @@
                     <h2 class="text-h4 mt-3">Take a Look at Forecasts</h2>
                 </div>
                 <div>
-                    <WeatherPreferences/>
+                    <WeatherPreferences :fetchNewWeatherInfo="fetchWeatherInfo"/>
                 </div>
             </div>
             <div v-if="Object.keys(weatherInfo).length !== 0">

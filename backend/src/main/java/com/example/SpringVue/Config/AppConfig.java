@@ -67,7 +67,7 @@ public class AppConfig {
                 .newCacheConfigurationBuilder(String.class,ForecastWrapper.class, ResourcePoolsBuilder.newResourcePoolsBuilder()
                         .offheap(10, MemoryUnit.MB)
                         .build())
-                .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofHours(3)))
+                .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofHours(1)))
                 .build();
 
         CachingProvider cachingProvider = Caching.getCachingProvider();

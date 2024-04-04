@@ -15,6 +15,6 @@ public class Condition implements Serializable {
 
     private String text;
     
-    private String icon;
+    private int code;
 
 }

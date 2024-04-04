@@ -2,6 +2,7 @@ package com.example.SpringVue.Dto.WeatherApi.Forecast.Location;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -20,5 +21,8 @@ public class Location implements Serializable {
     private String region;
 
     private String country;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime localtime;
 
 }
