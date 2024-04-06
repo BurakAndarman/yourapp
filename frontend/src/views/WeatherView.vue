@@ -3,6 +3,7 @@
     import { useStatusStore } from '../store/status';
     import { useAuthStore } from '../store/auth';
     import WeatherPreferences from '../components/WeatherPreferences.vue';
+    import WeatherCard from '../components/WeatherCard.vue';
 
     const auth = useAuthStore()
     const statusDialog = useStatusStore()
@@ -37,6 +38,8 @@
 
                     if(response.status == 200) {
                         weatherInfo.value = parsedResponse;
+
+                        afterFetchWeatherInfo()
                     
                     } else {
                         statusDialog.openStatusDialog(parsedResponse.message,'error')
@@ -66,7 +69,35 @@
 
     }
 
+    const afterFetchWeatherInfo = () => {
+        weatherInfo.value.forecastsList.forEach((cityForecast) => {
+            cityForecast.forecast.forecastday[0].astro.sunrise = reformatTwelveHourToMilitary(cityForecast.forecast.forecastday[0].astro.sunrise)
+            cityForecast.forecast.forecastday[0].astro.sunset = reformatTwelveHourToMilitary(cityForecast.forecast.forecastday[0].astro.sunset)
 
+            cityForecast.isDayTime = isDayTime(cityForecast.location.localtime, cityForecast.forecast.forecastday[0].astro.sunrise, cityForecast.forecast.forecastday[0].astro.sunset)
+        })
+    }
+
+    const reformatTwelveHourToMilitary = (twelveHour) => {
+        const hourArray = twelveHour.split(':')
+        const pm = hourArray[1].includes('PM')
+        let hour = parseInt(hourArray[0])
+
+        if (pm && hour < 12) {
+            hour += 12
+        
+        } else if (!pm && hour == 12) {
+            hour = 0
+        }
+
+        return `${hour.toString().padStart(2, '0')}:${hourArray[1].replace(/[AP]M/g, '')}`
+    }
+
+    const isDayTime = (localTime, sunrise, sunset) => {
+        const time = new Date(localTime).toLocaleTimeString('en-US',{ hour12 : false })
+
+        return time > sunrise && time < sunset
+    }
 </script>
 <template>
     <div class="bg-surface py-14">
@@ -80,7 +111,40 @@
                     <WeatherPreferences :fetchNewWeatherInfo="fetchWeatherInfo"/>
                 </div>
             </div>
-            <div v-if="Object.keys(weatherInfo).length !== 0">
+            <div v-if="Object.keys(weatherInfo).length !== 0"
+                 :class="`${weatherInfo.forecastsList.length === 1 || weatherInfo.look === 'slider' ? 'h-screen' : ''}`"
+                 :style="{ marginTop : (weatherInfo.look === 'slider' && weatherInfo.format === 'simple') || (weatherInfo.look === 'cards' && weatherInfo.forecastsList.length === 1 && weatherInfo.format === 'simple') ? '8em' : '40px' }"
+            >
+                <div v-if="weatherInfo.look === 'cards'"
+                     class="d-flex flex-column ga-10"
+                >
+                    <WeatherCard v-for="(cityForecast, index) in weatherInfo.forecastsList"
+                                 :cityForecast="cityForecast"
+                                 :format="weatherInfo.format"
+                                 :cityIndex="index"
+                                 :key="index"
+                    />
+                </div>
+                <template v-else>
+                    <v-carousel v-if="weatherInfo.forecastsList.length > 1"
+                                height="auto"
+                                hide-delimiters
+                    >
+                        <v-carousel-item v-for="(cityForecast, index) in weatherInfo.forecastsList"
+                                         :key="index"
+                        >
+                            <WeatherCard :cityForecast="cityForecast"
+                                         :format="weatherInfo.format"
+                                         :cityIndex="index"
+                            />
+                        </v-carousel-item>
+                    </v-carousel>
+                    <WeatherCard v-else
+                                 :cityForecast="weatherInfo.forecastsList[0]"
+                                 :format="weatherInfo.format"
+                                 :cityIndex="0"
+                    />
+                </template>
             </div>
             <div v-else class="mt-10 h-screen">
                 <div class="d-flex flex-column justify-center align-center ga-3">
@@ -91,3 +155,9 @@
         </div>
     </div>
 </template>
+<style scoped>
+    :deep(.v-carousel .v-btn) {
+        background-color: white;
+        color:black;
+    }
+</style>

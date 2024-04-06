@@ -20,8 +20,7 @@ import java.time.format.DateTimeFormatter;
 public class Current implements Serializable {
 
     @JsonProperty("last_updated")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
-    private LocalDateTime lastUpdated;
+    private String lastUpdated;
 
     @JsonProperty("temp_c")
     private double tempC;

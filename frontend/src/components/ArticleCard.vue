@@ -1,6 +1,4 @@
 <script setup>
-    import default_image from '../assets/default_news_image.jpg';
-
     const article = defineProps({
         imageUrl: String,
         title: String,
@@ -18,7 +16,7 @@
         class="align-end text-white"
         height="200"
         gradient="to bottom, rgba(0,0,0,.1), rgba(0,0,0,.5)"
-        :src="article.imageUrl || default_image"
+        :src="article.imageUrl || 'https://res.cloudinary.com/df6xomy8c/image/upload/v1/YourApp/News/defaultNewsImage.png'"
         cover
       >
         <v-card-title>{{ article.title }}</v-card-title>

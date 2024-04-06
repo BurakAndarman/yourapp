@@ -100,7 +100,9 @@ public class WeatherServiceImpl implements WeatherService {
     private ForecastsDto createForecastsResponse(WeatherPreferences weatherPreferences) {
         List<ForecastWrapper> forecastsList = new ArrayList<>();
 
-        weatherPreferences.getWeatherPreferencesCities().stream().forEach(weatherPreferencesCities -> forecastsList.add(weatherComponent.forecast(weatherPreferencesCities.getCityId())));
+        weatherPreferences.getWeatherPreferencesCities().stream()
+                .sorted(Comparator.comparingInt(WeatherPreferencesCities::getOrderNo))
+                .forEach(weatherPreferencesCities -> forecastsList.add(weatherComponent.forecast(weatherPreferencesCities.getCityId())));
 
         return new ForecastsDto(forecastsList,weatherPreferences.getFormat(),weatherPreferences.getLook());
     }
@@ -123,10 +125,12 @@ public class WeatherServiceImpl implements WeatherService {
 
         String format = userWeatherPreferences.getFormat();
         String look = userWeatherPreferences.getLook();
-        List<WeatherPreferencesCitiesDto> weatherPreferencesCitiesDtos = userWeatherPreferences.getWeatherPreferencesCities().stream().map(weatherPreferencesCities -> new WeatherPreferencesCitiesDto(
-                weatherPreferencesCities.getCityId(),
-                weatherPreferencesCities.getName(),
-                weatherPreferencesCities.getOrderNo()
+        List<WeatherPreferencesCitiesDto> weatherPreferencesCitiesDtos = userWeatherPreferences.getWeatherPreferencesCities().stream()
+                .sorted(Comparator.comparingInt(WeatherPreferencesCities::getOrderNo))
+                .map(weatherPreferencesCities -> new WeatherPreferencesCitiesDto(
+                    weatherPreferencesCities.getCityId(),
+                    weatherPreferencesCities.getName(),
+                    weatherPreferencesCities.getOrderNo()
         )).toList();
 
 

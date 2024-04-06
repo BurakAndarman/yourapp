@@ -60,7 +60,7 @@ public class AppConfig {
                 .newCacheConfigurationBuilder(String.class,HashMap.class, ResourcePoolsBuilder.newResourcePoolsBuilder()
                         .offheap(10, MemoryUnit.MB)
                         .build())
-                .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofHours(5)))
+                .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofHours(3)))
                 .build();
 
         CacheConfiguration<String, ForecastWrapper> forecastCacheConfig = CacheConfigurationBuilder
@@ -76,9 +76,9 @@ public class AppConfig {
         javax.cache.configuration.Configuration<String, HashMap> newsCacheConfiguration = Eh107Configuration.fromEhcacheCacheConfiguration(newsCacheConfig);
         javax.cache.configuration.Configuration<String, ForecastWrapper> forecastCacheConfiguration = Eh107Configuration.fromEhcacheCacheConfiguration(forecastCacheConfig);
 
-        cacheManager.createCache("userNewsCache",newsCacheConfiguration);
-        cacheManager.createCache("forecastCache",forecastCacheConfiguration);
+       cacheManager.createCache("userNewsCache",newsCacheConfiguration);
+       cacheManager.createCache("forecastCache",forecastCacheConfiguration);
 
-        return cacheManager;
+       return cacheManager;
     }
 }

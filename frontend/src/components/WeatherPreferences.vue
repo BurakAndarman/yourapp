@@ -130,7 +130,7 @@
             if(response.status == 200) {
                 weatherDialog.form.format = parsedResponse.format
                 weatherDialog.form.look = parsedResponse.look
-                weatherDialog.form.cities = parsedResponse.cities.sort((a,b) => a.orderNo - b.orderNo)
+                weatherDialog.form.cities = parsedResponse.cities
 
                 weatherDialog.isVisible = true
 
@@ -236,7 +236,7 @@
                         <v-list-item
                             v-bind="props"
                             :title="item.raw.name"
-                            :subtitle="`${item.raw.region}, ${item.raw.country}`"
+                            :subtitle="`${item.raw.region ? `${item.raw.region}, ` : ''}${item.raw.country}`"
                         />
                     </template>
                 </v-autocomplete>
