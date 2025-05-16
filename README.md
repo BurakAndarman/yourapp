@@ -15,7 +15,7 @@ YourApp is a web application that provides weather and news information and plan
 **1.** Spring Security<br/>
 **2.** Spring Data JPA<br/>
 **3.** Ehcache<br/>
-**4.** MySQL<br/>
+**4.** PostgreSQL<br/>
 **5.** Cloudinary (as Cloud Storage)<br/>
 **6.** WeatherAPI<br/>
 **7.** NewsAPI<br/>
