@@ -11,6 +11,7 @@ import org.ehcache.config.units.MemoryUnit;
 import org.ehcache.jsr107.Eh107Configuration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.jcache.JCacheCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -54,31 +55,32 @@ public class AppConfig {
     }
 
     @Bean
-    public CacheManager EhcacheManager() {
+    public org.springframework.cache.CacheManager cacheManager() {
+        CachingProvider cachingProvider = Caching.getCachingProvider();
+        CacheManager jCacheManager = cachingProvider.getCacheManager();
 
         CacheConfiguration<String, HashMap> newsCacheConfig = CacheConfigurationBuilder
-                .newCacheConfigurationBuilder(String.class,HashMap.class, ResourcePoolsBuilder.newResourcePoolsBuilder()
-                        .offheap(10, MemoryUnit.MB)
-                        .build())
+                .newCacheConfigurationBuilder(String.class, HashMap.class,
+                        ResourcePoolsBuilder.newResourcePoolsBuilder()
+                                .offheap(10, MemoryUnit.MB))
                 .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofHours(3)))
                 .build();
 
         CacheConfiguration<String, ForecastWrapper> forecastCacheConfig = CacheConfigurationBuilder
-                .newCacheConfigurationBuilder(String.class,ForecastWrapper.class, ResourcePoolsBuilder.newResourcePoolsBuilder()
-                        .offheap(10, MemoryUnit.MB)
-                        .build())
+                .newCacheConfigurationBuilder(String.class, ForecastWrapper.class,
+                        ResourcePoolsBuilder.newResourcePoolsBuilder()
+                                .offheap(10, MemoryUnit.MB))
                 .withExpiry(ExpiryPolicyBuilder.timeToLiveExpiration(Duration.ofHours(1)))
                 .build();
 
-        CachingProvider cachingProvider = Caching.getCachingProvider();
-        CacheManager cacheManager = cachingProvider.getCacheManager();
+        javax.cache.configuration.Configuration<String, HashMap> newsCacheConfiguration =
+                Eh107Configuration.fromEhcacheCacheConfiguration(newsCacheConfig);
+        javax.cache.configuration.Configuration<String, ForecastWrapper> forecastCacheConfiguration =
+                Eh107Configuration.fromEhcacheCacheConfiguration(forecastCacheConfig);
 
-        javax.cache.configuration.Configuration<String, HashMap> newsCacheConfiguration = Eh107Configuration.fromEhcacheCacheConfiguration(newsCacheConfig);
-        javax.cache.configuration.Configuration<String, ForecastWrapper> forecastCacheConfiguration = Eh107Configuration.fromEhcacheCacheConfiguration(forecastCacheConfig);
+        jCacheManager.createCache("userNewsCache", newsCacheConfiguration);
+        jCacheManager.createCache("forecastCache", forecastCacheConfiguration);
 
-       cacheManager.createCache("userNewsCache",newsCacheConfiguration);
-       cacheManager.createCache("forecastCache",forecastCacheConfiguration);
-
-       return cacheManager;
+        return new JCacheCacheManager(jCacheManager);
     }
 }

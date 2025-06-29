@@ -52,7 +52,7 @@ public class WeatherComponent {
     }
 
 
-    @Cacheable(value = "forecastCache", key = "#cityId")
+    @Cacheable(value = "forecastCache", key = "T(String).valueOf(#cityId)")
     public ForecastWrapper forecast(int cityId) {
 
         log.info("Trying to fetch forecasts for city with city id " + cityId);
